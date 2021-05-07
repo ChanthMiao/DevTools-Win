@@ -73,12 +73,12 @@ ls .\lib
 
 自定义配置存放于模块根目录下的 config.json 文件（不支持注释）内，用于覆盖默认配置
 
-```json
+```json5
 {
     "http_proxy": "http://192.168.36.1:8080", // 避免每次使用swp时重复输入
-    "vswhere_path":"C:\\Program Files (x86)\\Microsoft Visual Studio\\Installer\\vswhere.exe", // 指定vswhere程序路径
+    "vswhere_path": "C:\\Program Files (x86)\\Microsoft Visual Studio\\Installer\\vswhere.exe", // 指定vswhere程序路径
     "vcpkg_root": "C:\\Users\\abc\\source\\repos\\vcpkg", // 指定 vcpkg 根目录，否则遵循$Env:VCPKG_ROOT，默认为空
-    "clang_path":"C:\\Users\\abc\\scoop\\shims\\clang.ps1", // 指定clang路径，默认'clang'
+    "clang_path": "C:\\Users\\abc\\scoop\\shims\\clang.ps1", // 指定clang路径，默认'clang'
     "disable_cswinrt": false // 禁用可选依赖，默认false
 }
 ```
