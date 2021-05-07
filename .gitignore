@@ -1,0 +1,4 @@
+*.dll
+test
+config.json
+.vscode
