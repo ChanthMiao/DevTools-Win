@@ -14,7 +14,7 @@ if ([System.Environment]::OSVersion.Platform -eq [System.PlatformID]::Win32NT) {
     if ($Env:VCPKG_ROOT) {
         $DevToolsConf.Vcpkg = $Env:VCPKG_ROOT
     }
-    $conf_from_json = (Get-Content -Path "$PSScriptRoot\config.json" -Encoding utf8 | ConvertFrom-Json)
+    $conf_from_json = (Get-Content -Path "$PSScriptRoot\config.json" -Encoding utf8 -ErrorAction SilentlyContinue | ConvertFrom-Json)
     if ($conf_from_json.http_proxy) {
         $DevToolsConf.Proxy = $conf_from_json.http_proxy
     }

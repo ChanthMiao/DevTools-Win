@@ -7,8 +7,12 @@ if ([System.Environment]::OSVersion.Platform -eq [System.PlatformID]::Win32NT) {
     if (Test-Path Env:\DevTools_UnSupported_Functions) {
         Remove-Item Env:\DevTools_UnSupported_Functions
     }
+
+    $ModuleRoot = Resolve-Path -Path "$PSScriptRoot\.."
+    $disable_cswinrt = (Get-Content -Path "$ModuleRoot\config.json" -Encoding utf8 -ErrorAction SilentlyContinue | ConvertFrom-Json | Select-Object -ExpandProperty disable_cswinrt)
+
     if ([System.Environment]::Version -ge [System.Version]"5.0.0") {
-        if ([System.Environment]::OSVersion.Version -lt [System.Version]"10.0.17763.0") {
+        if (([System.Environment]::OSVersion.Version -lt [System.Version]"10.0.17763.0") -or $disable_cswinrt) {
             $Env:DevTools_UnSupported_Functions = $UnSupported_Functions
         }
         else {
@@ -16,7 +20,6 @@ if ([System.Environment]::OSVersion.Platform -eq [System.PlatformID]::Win32NT) {
             . "${PSScriptRoot}\Install-Dlls.ps1"
             # The existing WinRT interop system has been removed from the .NET runtime as part of .NET 5.0.
             # Load Microsoft.Windows.SDK.NET.dll and WinRT.Runtime.dll.
-            $ModuleRoot = Resolve-Path -Path "$PSScriptRoot\.."
             $LocalCswinrtVersion = Get-LocalDllVersion -DllPath "$ModuleRoot\lib\WinRT.Runtime.dll"
             $LocalWdkVersion = Get-LocalDllVersion -DllPath "$ModuleRoot\lib\Microsoft.Windows.SDK.NET.dll"
             $WdkPattern = if ([System.Environment]::OSVersion.Version -ge [System.Version]"10.0.19041.0") {
