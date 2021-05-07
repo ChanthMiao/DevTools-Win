@@ -130,13 +130,13 @@
             Tags = @('Developer', 'DevTools', 'Powerfull')
 
             # A URL to the license for this module.
-            # LicenseUri = ''
+            LicenseUri = 'https://github.com/ChanthMiao/DevTools-Win/raw/main/LICENSE'
 
             # A URL to the main website for this project.
-            # ProjectUri = ''
+            ProjectUri = 'https://github.com/ChanthMiao/DevTools-Win'
 
             # A URL to an icon representing this module.
-            # IconUri = ''
+            IconUri = 'https://raw.githubusercontent.com/ChanthMiao/DevTools-Win/main/assets/icon_64px.png'
 
             # ReleaseNotes of this module
             # ReleaseNotes = ''

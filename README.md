@@ -4,6 +4,8 @@
 
 个人在 Windows 下的自用的 Powershell 脚本集合，可以有效改善 Windows 下的开发体验。
 
+![Icon2](https://cdn.jsdelivr.net/gh/ChanthMiao/DevTools-Win@main/assets/icon_64px.png)
+
 ## 主要功能
 
 |       命令        | 别名  | 功能简述                                          |
