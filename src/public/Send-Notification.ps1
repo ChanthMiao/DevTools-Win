@@ -40,7 +40,8 @@ function Send-Notification {
         else {
             $SoundElement = '<audio src="ms-winsoundevent:Notification.Default" />'
         }
-        $AppId = Get-WindowsAppId        
+        $AppId = Get-WindowsAppId
+        $Icon = (Resolve-Path -Path $Icon).Path
     }
 
     process {
@@ -49,9 +50,9 @@ function Send-Notification {
             <toast>
             <visual>
                 <binding template="ToastGeneric">
+                <image src="$Icon" placement="appLogoOverride" hint-crop="circle" />
                 <text>$ToastTitle</text>
                 <text>$msg</text>
-                <image src="$((Resolve-Path -Path $Icon).Path)" placement="appLogoOverride" hint-crop="circle" />
                 </binding>
             </visual>
             $SoundElement
@@ -62,9 +63,11 @@ function Send-Notification {
                 if ([System.Environment]::Version -lt [System.Version]"5.0.0") {
                     # In this case, use builtin WinRT Interop system.
                     [Windows.Data.Xml.Dom.XmlDocument, Windows.Data.Xml.Dom, ContentType = WindowsRuntime] | Out-Null
+                    [Windows.UI.Notifications.ToastNotification, Windows.UI.Notifications, ContentType = WindowsRuntime] | Out-Null
                     [Windows.UI.Notifications.ToastNotificationManager, Windows.UI.Notifications, ContentType = WindowsRuntime] | Out-Null
                 }
                 else {
+                    # Load WinRT assembly file.
                     Add-Type -Path $args
                 }
                 $ToastXml = [Windows.Data.Xml.Dom.XmlDocument]::new()
