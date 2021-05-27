@@ -42,13 +42,13 @@ function Set-WebProxy {
             $_proxy = $ProxyObject
         }
         else {
-            $caps = [regex]::Match($Proxy, "^http://(?<credentials>(?<user>[^:@]+):(?<passwd>(?:[^@:]|\\:|\\@)+)@)?(?<address>(?:[^@:]+|\[[:0-9a-fA-F]+\])(?::\d+)?/?)$").Groups
+            $caps = [regex]::Match($Proxy, '^http://(?<credentials>(?<user>[^:@]+):(?<passwd>(?:[^@:]|\\:|\\@)+)@)?(?<address>(?:[^@:]+|\[[:0-9a-fA-F]+\])(?::\d+)?/?)$').Groups
             $address = $caps | Where-Object { $_.Name -eq "address" } | Select-Object -ExpandProperty "Value"
             $_proxy.Address = "http://$address"
             $_proxy.BypassProxyOnLocal = $true
             if ($caps | Where-Object { $_.Name -eq "credentials" } | Select-Object -ExpandProperty "Success") {
                 $user = $caps | Where-Object { $_.Name -eq "user" } | Select-Object -ExpandProperty "Value"
-                $passwd = ($caps | Where-Object { $_.Name -eq "passwd" } | Select-Object @{l = 'Value'; e = { $_.Value -replace '\\([@:])', '$1' } }).Value
+                $passwd = ($caps | Where-Object { $_.Name -eq "passwd" } | Select-Object @{l = 'Value'; e = { $_.Value -replace '\\([@:])', '$&' } }).Value
                 $_proxy.Credentials = New-Object System.Net.NetworkCredential $user, $passwd
             }
             elseif (-not $NoDefaultCredentials) {
