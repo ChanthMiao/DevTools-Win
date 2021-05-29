@@ -12,7 +12,7 @@
     RootModule             = 'DevTools-Win.psm1'
 
     # Version number of this module.
-    ModuleVersion          = '1.0.0'
+    ModuleVersion          = '1.0.1'
 
     # Supported PSEditions
     CompatiblePSEditions   = @('Core', "Desktop")
@@ -79,6 +79,7 @@
         'Get-CmdletAlias',
         'Get-ItemSize',
         'Get-TempDir',
+        'New-RandString',
         'Remove-Path',
         'Send-Notification',
         'Set-WebProxy',
@@ -104,6 +105,7 @@
         'gcas',
         'gis',
         'gtd',
+        'nrs',
         'rpa',
         'salg',
         'sdnf',

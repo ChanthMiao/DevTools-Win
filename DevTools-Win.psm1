@@ -33,6 +33,7 @@ if ([System.Environment]::OSVersion.Platform -eq [System.PlatformID]::Win32NT) {
     # Public core functions.
     . $PSScriptRoot\src\public\core\Add-Path.ps1
     . $PSScriptRoot\src\public\core\Remove-Path.ps1
+    . $PSScriptRoot\src\public\core\New-RandString.ps1
     # Public functions.
     . $PSScriptRoot\src\public\Format-ItemSize.ps1
     . $PSScriptRoot\src\public\Get-TempDir.ps1

@@ -11,26 +11,31 @@ function Send-Notification {
         [Alias("Value", "Content", "Message", "Body")]
         [string[]]
         $ToastContent,
-        [Parameter(Position = 2)]
+        [Parameter()]
         [ValidateNotNullOrEmpty()]
-        [ValidateScript( { 
-                try {
-                    if ((New-Object System.Uri $_).Scheme -in @('http', 'https', 'file')) {
-                        return $true
-                    }
-                    else {
-                        return $false
-                    }
+        [ValidateScript( {
+                [System.Uri]$_checked_uri = $null
+                if (-not [System.Uri]::TryCreate($_, [System.UriKind]::Absolute, [ref]$_checked_uri)) {
+                    $false
                 }
-                catch {
-                    return $false
+                elseif ($_checked_uri.Scheme -notin @('http', 'https', 'file')) {
+                    $false
+                }
+                elseif ($_checked_uri.IsFile -and !(Test-Path $_checked_uri.AbsolutePath -PathType Leaf)) {
+                    $false
+                }
+                else {
+                    $true
                 }
             })]
         [string]
         $Icon = "$PSScriptRoot\..\..\assets\icon_64px.png",
-        [Parameter(Position = 3)]
+        [Parameter()]
         [switch]
-        $Silent
+        $Silent,
+        [Parameter()]
+        [switch]
+        $NoWait
     )
 
     begin {
@@ -41,7 +46,7 @@ function Send-Notification {
             $SoundElement = '<audio src="ms-winsoundevent:Notification.Default" />'
         }
         $AppId = Get-WindowsAppId
-        $Icon = (Resolve-Path -Path $Icon).Path
+        $Icon = [System.Uri]::new($Icon, [System.UriKind]::Absolute).AbsoluteUri
     }
 
     process {
@@ -58,8 +63,9 @@ function Send-Notification {
             $SoundElement
             </toast>
 "@
+            $jprefix = "psnotification-$(New-RandString)"
             # Start-Job make it possible to unload Assemblies of WinRT interop.
-            Start-Job -ScriptBlock {
+            $job = Start-Job -ScriptBlock {
                 if ([System.Environment]::Version -lt [System.Version]"5.0.0") {
                     # In this case, use builtin WinRT Interop system.
                     [Windows.Data.Xml.Dom.XmlDocument, Windows.Data.Xml.Dom, ContentType = WindowsRuntime] | Out-Null
@@ -77,13 +83,23 @@ function Send-Notification {
                 if ($PSEdition -eq "Desktop") {
                     Write-Output "This just fix bug in Windows Powershell 5" | Out-Null
                 }
-            } -Name "$ToastTitle-$(New-Guid)" -ArgumentList "$(Resolve-Path "$PSScriptRoot\..\..\lib\Microsoft.Windows.SDK.NET.dll")" | Out-Null
-
+            } -ArgumentList "$(Resolve-Path "$PSScriptRoot\..\..\lib\Microsoft.Windows.SDK.NET.dll")"
+            Register-ObjectEvent -InputObject $job -EventName StateChanged -SourceIdentifier "$jprefix-$(New-RandString)" -Action {
+                if ($EventSubscriber.SourceObject.State -eq 'Completed') {
+                    Unregister-Event -SourceIdentifier $EventSubscriber.SourceIdentifier
+                    Remove-Event -SourceIdentifier $EventSubscriber.SourceIdentifier
+                    Remove-Job -Name $EventSubscriber.SourceIdentifier
+                    Remove-Job -Id $EventSubscriber.SourceObject.Id | Out-Null
+                }
+            } | Out-Null
         }
     }
 
     end {
-        Get-Job -Name "$ToastTitle*" | Wait-Job -Timeout 3 | Remove-Job
+        # When this command is invoked in interactive terminal, recommend to use '-NoWait'.
+        if (-not $NoWait) {
+            Get-Job -Name "$jpreifx*" | Wait-Job -Timeout 3 | Out-Null
+        }
     }
 }
 
