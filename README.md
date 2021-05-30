@@ -1,6 +1,6 @@
 # DevTools-Win
 
-~~为 Windows 用户程序员设计的 Powershell 辅助开发模块。~~
+~~为 Windows 用户设计的 Powershell 辅助开发模块。~~
 
 个人在 Windows 下的自用的 Powershell 脚本集合，可以有效改善 Windows 下的开发体验。
 
@@ -12,9 +12,9 @@
 | :---------------: | :---: | :------------------------------------------------ |
 |   Set-WebProxy    |  swp  | 为当前Powershell会话设置网络代理                  |
 |  Clear-WebProxy   | clwp  | 清除当前Powershell会话的网络代理                  |
-|     Add-Path      |  apa  | 快速向环境变量（PATH一类）添加路径                |
-|    Remove-Path    |  rpa  | 快速从环境变量（PATH一类）删除路径                |
-|    Enter-VsEnv    | etvs  | 轻松设定 VS 开发者 cli 环境                       |
+|     Add-Path      |  apa  | 向环境变量（PATH一类）添加路径                    |
+|    Remove-Path    |  rpa  | 从环境变量（PATH一类）删除路径                    |
+|    Enter-VsEnv    | etvs  | 设定 VS 开发者 cli 环境                           |
 |   Enable-Clang    | ecla  | 设置运行clang必要的环境变量（LIB, INCLUDE, PATH） |
 |   Enable-Vcpkg    | evpg  | 为 cli 环境集成 vcpkg                             |
 |  Format-ItemSize  |  fis  | 字节单位换算，提高文件大小可读性                  |
@@ -25,6 +25,7 @@
 |     Write-Log     | wrlg  | 简易日志接口，提高脚本可维护性                    |
 |     Start-Log     | salg  | 记录当前 Powershell 会话或脚本输出                |
 |     Stop-Log      | splg  | 停止记录当前 Powershell 会话或脚本输出            |
+|  New-RandString   |  nrs  | 生成随机字符串                                    |
 
 ## 命令详细文档
 
@@ -69,11 +70,11 @@ ls .\lib
 # 
 ```
 
-后续如果需要更新依赖库文件，仅需手动删除上述 lib 路径，重新执行以上依赖安装步骤。
+后续如果需要更新依赖库文件，仅需手动删除上述 lib 路径，以在在下次加载触发依赖安装。
 
 ## 自定义配置
 
-自定义配置存放于目录`$Env:LOCALAPPDATA\DevTools-Win`下的 config.json 文件（不支持注释）内，用于覆盖默认配置
+自定义配置存放于目录`$Env:LOCALAPPDATA\DevTools-Win`下的 config.json 文件（不支持注释）内，用于覆盖默认配置。
 
 ```json5
 {
@@ -86,7 +87,7 @@ ls .\lib
 
 ## 兼容性
 
-本模块属于自用脚本打包分享。我个人的主要使用环境为 Windows 10 + Powershell Core + Windows Terminal。在正式发布前，已针对 Windows Powershell 5.1 进行了一定程度的兼容性适配，但不保证 100% 兼容。
+本模块基于自用脚本打包分享。我个人的主要使用环境为 Windows 10 + Powershell Core + Windows Terminal。在正式发布前，已针对 Windows Powershell 5.1 进行了一定程度的兼容性适配，但不保证 100% 兼容。
 
 微软当前对Powershell的开发重心已全方面倾斜至 Powershell Core，原 Windows Powershell 5.1 仅做兼容性保留（实际使用上，我已遇到不少Bug，但长期未修复）。考虑到目前二者间差异和维护状态，个人建议用户迁移至 Powershell Core。
 
