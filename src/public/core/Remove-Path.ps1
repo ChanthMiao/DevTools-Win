@@ -38,10 +38,9 @@ function Remove-Path {
 
     begin {
         $_paths = New-Object 'System.Collections.Generic.List[string]'
-        if (Test-Path "Env:\$Target") {
-            (Get-Item "Env:\$Target" | Select-Object -ExpandProperty 'Value').Split(';') | ForEach-Object {
-                $_paths.Add($_)
-            }
+        $TargetValue = [System.Environment]::GetEnvironmentVariable($Target)
+        if ($TargetValue) {
+            $TargetValue.Split(';').ForEach( { $_paths.Add($_) })
         }
         if ($PSCmdlet.ParameterSetName -eq 'Advanced') {
             if ($Index -gt $_paths.Count) {
@@ -55,8 +54,8 @@ function Remove-Path {
         if ($PSCmdlet.ParameterSetName -eq "ByValue") {
             foreach ($pa in $Path) {
                 if (-not $_paths.Contains($pa)) {
-                    if ($pa -match '.*?(?<!:)\\$') {
-                        $pa = $pa.TrimEnd('\')
+                    if ($pa.EndsWith([System.IO.Path]::DirectorySeparatorChar) -and ![System.IO.Path]::IsPathRooted($pa)) {
+                        $pa = $pa.TrimEnd([System.IO.Path]::DirectorySeparatorChar)
                         if (-not $_paths.Contains($pa)) {
                             Write-Verbose "Directory $pa is not in Env:\$Target, skiped!"
                             Continue
@@ -96,7 +95,7 @@ function Remove-Path {
     }
 
     end {
-        Set-Item -Path "Env:\$Target" -Value ($_paths -join ';')
+        [System.Environment]::SetEnvironmentVariable($Target, [string]::Join([System.IO.Path]::PathSeparator, $_paths))
         if ($PassThru) {
             $_paths | Write-Output
         }

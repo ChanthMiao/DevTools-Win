@@ -9,15 +9,15 @@ function Start-Log {
         $LogFile
     )
 
-    end{
+    end {
         if ([System.String]::IsNullOrWhiteSpace($LogFile)) {
             if (-not $MyInvocation.PSCommandPath) {
                 Start-Transcript -OutputDirectory $Env:TEMP -Append -IncludeInvocationHeader -UseMinimalHeader
                 return
             }
-            $LogFile = ( Join-Path (Join-Path $MyInvocation.PSScriptRoot "logs") "$($MyInvocation.PSCommandPath | Split-Path -LeafBase).log" )
+            $LogFile = [System.IO.Path]::Combine($MyInvocation.PSScriptRoot, "logs", [System.IO.Path]::GetFileNameWithoutExtension($MyInvocation.PSCommandPath), "log")
         }
-        if (-not (Test-Path $LogFile -PathType Leaf)) {
+        if (-not [System.IO.File]::Exists($LogFile)) {
             New-Item -Path $LogFile -ItemType File -Force
         }
         Start-Transcript -Path $LogFile -Append -IncludeInvocationHeader -UseMinimalHeader

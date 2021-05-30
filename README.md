@@ -45,7 +45,7 @@
 - <https://github.com/dotnet/runtime/issues/37672>
 - <https://github.com/PowerShell/PowerShell/blob/master/CHANGELOG/7.1.md>
 
-不需要在 Powershell Core 使用 `Send-Notification` 命令的用户，可在模块根目录的配置文件 config.json 写入键值对 `"disable_cswinrt: true"` 永久禁用此依赖。
+不需要在 Powershell Core 使用 `Send-Notification` 命令的用户，可在模块配置目录的创建名为disable-cswinrt的空文件（对应指令为`New-Item $Env:LOCALAPPDATA\DevTools-Win\disable-cswinrt -Force`）。
 
 需要使用此依赖的用户则遵照以下步的依赖安装：
 
@@ -73,15 +73,14 @@ ls .\lib
 
 ## 自定义配置
 
-自定义配置存放于模块根目录下的 config.json 文件（不支持注释）内，用于覆盖默认配置
+自定义配置存放于目录`$Env:LOCALAPPDATA\DevTools-Win`下的 config.json 文件（不支持注释）内，用于覆盖默认配置
 
 ```json5
 {
-    "http_proxy": "http://192.168.36.1:8080", // 避免每次使用swp时重复输入
-    "vswhere_path": "C:\\Program Files (x86)\\Microsoft Visual Studio\\Installer\\vswhere.exe", // 指定vswhere程序路径
-    "vcpkg_root": "C:\\Users\\abc\\source\\repos\\vcpkg", // 指定 vcpkg 根目录，否则遵循$Env:VCPKG_ROOT，默认为空
-    "clang_path": "C:\\Users\\abc\\scoop\\shims\\clang.ps1", // 指定clang路径，默认'clang'
-    "disable_cswinrt": false // 禁用可选依赖，默认false
+    "Proxy": "http://192.168.36.1:8080", // 避免每次使用swp时重复输入，可被$Env:HTTP(S)_PROXY覆盖，默认为空
+    "VsWhere": "C:\\Program Files (x86)\\Microsoft Visual Studio\\Installer\\vswhere.exe", // 指定vswhere程序路径，可被$Env:VSWHERE_PATH覆盖
+    "VcpkgRoot": "C:\\Users\\abc\\source\\repos\\vcpkg", // 指定 vcpkg 根目录，可被$Env:VCPKG_ROOT覆盖，默认为空
+    "Clang": "C:\\Users\\abc\\scoop\\shims\\clang.ps1", // 指定clang路径，可被$Env:CLANG_PATH覆盖，默认为空
 }
 ```
 
@@ -93,4 +92,4 @@ ls .\lib
 
 ## Dirty Hack
 
-由于 .Net 技术栈本身的限制，`Remove-Module` 无法卸载 Assembly 文件。这会导致烦人的文件占用问题。为了克服这一问题，`Send-Notification` 命令在实现上采用了一点小技巧。通过 `Start-Job` 创建后台任务的副作用（脱离当前会话），使 Assembly 文件的加载限定在新的 AppDomain 内。这样，Assembly 文件会在任务完成后自动完成（随新 AppDomain 一起被卸载）。
+由于 .Net 技术栈本身的限制，`Remove-Module` 无法卸载 Assembly 文件。这会导致烦人的文件占用问题。为了克服这一问题，`Send-Notification` 命令在实现上采用了一点小技巧。通过 `Start-Job` 创建后台任务的副作用（脱离当前会话），使 Assembly 文件的加载限定在新的 AppDomain 内。这样，Assembly 文件会在任务完成后自动完成卸载（随新 AppDomain 一起被卸载）。

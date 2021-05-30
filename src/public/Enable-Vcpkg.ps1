@@ -3,9 +3,11 @@ function Enable-Vcpkg {
     param (
         [Parameter()]
         [ValidateNotNullOrEmpty()]
-        [ValidateScript( { (Get-Command  "$_\vcpkg" | Split-Path -LeafBase) -eq "vcpkg" })]
+        [ValidateScript( {
+                [System.IO.Path]::GetFileNameWithoutExtension((Get-Command ([System.IO.Path]::Combine($_, "vcpkg")))) -eq 'vcpkg'
+            })]
         [string]
-        $VcpkgPath = $Script:DevToolsConf.Vcpkg
+        $VcpkgRoot = (Get-Config -Name 'VcpkgRoot')
     )
 
     begin {
@@ -13,12 +15,12 @@ function Enable-Vcpkg {
     }
 
     end {
-        Add-Path $VcpkgPath -Verbose:$isVerbose
+        Add-Path $VcpkgRoot -Verbose:$isVerbose
         if (Get-Module -Name posh-vcpkg -ErrorAction SilentlyContinue) {
             Write-Verbose "PSModule 'posh-vcpkg' already imported."
         }
         else {
-            Join-Path $VcpkgPath 'scripts\posh-vcpkg' | Import-Module -Global
+            [System.IO.Path]::Combine($VcpkgRoot, 'scripts\posh-vcpkg') | Import-Module -Global
         }
     }
 }

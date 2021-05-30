@@ -7,7 +7,7 @@ function Set-WebProxy {
         [ValidatePattern("^http://(?:[^:@]+:(?:[^@:]|\\:|\\@)+@)?([^:@]+|\[[:0-9a-fA-F]+\])(:\d+)?/?$")]
         [Alias("P")]
         [string]
-        $Proxy = $Script:DevToolsConf.Proxy,
+        $Proxy = (Get-Config -Name 'Proxy'),
         [Parameter(ParameterSetName = "Basic", ValueFromPipeline = $true, ValueFromPipelineByPropertyName = $true)]
         [ValidateNotNullOrEmpty()]
         [Alias("Uri", "AbsoluteUri")]

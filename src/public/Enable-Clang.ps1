@@ -2,11 +2,11 @@ function Enable-Clang {
     [CmdletBinding()]
     param (
         [ValidateNotNullOrEmpty()]
-        [ValidateScript( { 
-                (Get-Command $_ | Split-Path -LeafBase) -eq 'clang' 
+        [ValidateScript( {
+                [System.IO.Path]::GetFileNameWithoutExtension((Get-Command $_)) -eq 'clang'
             })]
         [string]
-        $ClangPath = $Script:DevToolsConf.Clang
+        $ClangPath = (Get-Config -Name 'Clang')
     )
     [bool]$isVerbose = if ($VerbosePreference -eq "SilentlyContinue") { $false }else { $true }
     $clangInfo = (&$ClangPath --version)
@@ -17,11 +17,11 @@ function Enable-Clang {
     }
     $clangVersion = ($clangInfo -match 'clang version').Split()[-1]
     $clangInstallDir = ($clangInfo -match 'InstalledDir').Split(' ', 2)[1]
-    $llvmInstallDir = Split-Path $clangInstallDir
-    $llvmIncludeDir = Join-Path $llvmInstallDir "include"
-    $llvmLibDir = Join-Path $llvmInstallDir "lib"
-    $clangIncludeDir = Join-Path $llvmInstallDir "lib\clang" $clangVersion "include"
-    $clangLibDir = Join-Path $llvmInstallDir "lib\clang" $clangVersion "lib\windows"
+    $llvmInstallDir = [System.IO.Directory]::GetParent($clangInstallDir)
+    $llvmIncludeDir = [System.IO.Path]::Combine($llvmInstallDir, "include")
+    $llvmLibDir = [System.IO.Path]::Combine($llvmInstallDir, "lib")
+    $clangIncludeDir = [System.IO.Path]::Combine($llvmInstallDir, "lib", "clang", $clangVersion, "include")
+    $clangLibDir = [System.IO.Path]::Combine($llvmInstallDir, "lib", "clang", $clangVersion, "lib", "windows")
     # Add resources paths to environment variables.
     $llvmIncludeDir, $clangIncludeDir | Add-Path -Target 'INCLUDE'
     $llvmLibDir, $clangLibDir | Add-Path -Target 'LIB'

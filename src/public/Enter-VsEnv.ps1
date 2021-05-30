@@ -57,9 +57,11 @@ function Enter-VsEnv {
         [Parameter(ParameterSetName = "InstallPath")]
         [Parameter(ParameterSetName = "List")]
         [Parameter(ParameterSetName = "Advanced")]
-        [ValidateScript( { (Get-Command $_ | Split-Path -LeafBase) -eq 'vswhere' })]
+        [ValidateScript( {
+                [System.IO.Path]::GetFileNameWithoutExtension((Get-Command $_)) -eq 'vswhere'
+            })]
         [string]
-        $VsWherePath = $Script:DevToolsConf.Vswhere
+        $VsWherePath = (Get-Config -Name 'VsWhere')
     )
     
     begin {

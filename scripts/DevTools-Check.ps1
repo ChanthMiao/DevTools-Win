@@ -8,8 +8,14 @@ if ([System.Environment]::OSVersion.Platform -eq [System.PlatformID]::Win32NT) {
         Remove-Item Env:\DevTools_UnSupported_Functions
     }
 
-    $ModuleRoot = Resolve-Path -Path "$PSScriptRoot\.."
-    $disable_cswinrt = (Get-Content -Path "$ModuleRoot\config.json" -Encoding utf8 -ErrorAction SilentlyContinue | ConvertFrom-Json | Select-Object -ExpandProperty disable_cswinrt)
+    $ModuleRoot = [System.IO.Path]::GetFullPath("$PSScriptRoot\..")
+    $PlaceHolder = [System.IO.Path]::Combine($Env:LOCALAPPDATA, 'DevTools-Win', 'disable-cswinrt')
+    $disable_cswinrt = if ([System.IO.File]::Exists($PlaceHolder)) {
+        $true
+    }
+    else {
+        $false
+    }
 
     if ([System.Environment]::Version -ge [System.Version]"5.0.0") {
         if (([System.Environment]::OSVersion.Version -lt [System.Version]"10.0.17763.0") -or $disable_cswinrt) {

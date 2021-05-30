@@ -38,7 +38,7 @@ function Write-Log {
         }
         $localLevel = $LevelTable[$Level]
         $caller = if ($MyInvocation.PSCommandPath) {
-            $MyInvocation.PSCommandPath | Split-Path -Leaf
+            [System.IO.Path]::GetFileName($MyInvocation.PSCommandPath)
         }
         else {
             'Interactive'
