@@ -1,3 +1,4 @@
+# TODO: refactor it.
 function Enter-VsEnv {
     [CmdletBinding(DefaultParameterSetName = "Latest")]
     param (
@@ -90,7 +91,7 @@ function Enter-VsEnv {
                     $_sets = Where-Object { $_.catalog_productLineVersion -eq $Version } -InputObject $_sets
                 }
                 if ($Edition) {
-                    $_sets = Where-Object { $_.productId -eq ("Microsoft.VisualStudio.Product." + $Edition) } -InputObject $_sets
+                    $_sets = Where-Object { $_.productId -eq ("Microsoft.VisualStudio.Product.$Edition") } -InputObject $_sets
                 }
                 $_sets | Select-Object -ExpandProperty installationPath -First
                 break
@@ -127,7 +128,8 @@ function Enter-VsEnv {
             $cmdbatCall = $cmdbatCall -replace "-test", ""
             Write-Warning "Parameter '-test' not supported currently. Drop it."
         }
-        $logoText = @()
+        Write-Debug $cmdbatCall
+        [System.Collections.Generic.List[string]]$logoText = @()
         Invoke-Expression $cmdbatCall | ForEach-Object -Begin { 
             $Env:VSCMD_SKIP_SENDTELEMETRY = "1"
             $Env:VSCMD_BANNER_SHELL_NAME_ALT = "Developer PowerShell"
@@ -137,20 +139,25 @@ function Enter-VsEnv {
             switch -Regex ($line) {
                 "^\[DEBUG:(?'key'.*?)\] (?'value'.*?)$" { Write-Debug "[$($Matches.key)] $($Matches.value)" ; break }
                 "^\[ERROR:(?'key'.*?)\] (?'value'.*?)$" { Write-Error "[$($Matches.key)] $($Matches.value)" ; break }
-                "(?'key'[^=].*?)=(?'value'.*)$" { Set-Item -Path "Env:\$($Matches.key)" -Value $Matches.value ; break }
-                "^\*\*.*$" { $logoText += $line ; break }
+                "(?'key'[^=].*?)=(?'value'.*)$" {
+                    if ($Matches.key -in @('Path', 'INCLUDE', 'LIB', 'LIBPATH')) {
+                        $_sc = [System.Collections.Generic.HashSet[string]]($Matches.value.Split([System.IO.Path]::PathSeparator))
+                        $_v = [string]::Join([System.IO.Path]::PathSeparator, $_sc)
+                        [System.Environment]::SetEnvironmentVariable($Matches.key, $_v)
+                    }
+                    else {
+                        [System.Environment]::SetEnvironmentVariable($Matches.key, $Matches.value)
+                    }
+                    break 
+                }
+                "^\*\*.*$" { $logoText.Add($line) ; break }
                 Default { Write-Verbose $line }
             }
         } -End {
-            if (Test-Path Env:\VSCMD_SKIP_SENDTELEMETRY) {
-                Remove-Item Env:VSCMD_SKIP_SENDTELEMETRY
-            }
-            if (Test-Path Env:\VSCMD_BANNER_SHELL_NAME_ALT) {
-                Remove-Item Env:VSCMD_BANNER_SHELL_NAME_ALT
-            }
-            if (Test-Path Env:\VSCMD_DEBUG) {
-                Remove-Item Env:\VSCMD_DEBUG
-            }
+            [System.Environment]::SetEnvironmentVariable('VSCMD_SKIP_SENDTELEMETRY', $null)
+            [System.Environment]::SetEnvironmentVariable('VSCMD_BANNER_SHELL_NAME_ALT', $null)
+            [System.Environment]::SetEnvironmentVariable('VSCMD_DEBUG', $null)
+
             if (-not $NoLogo) {
                 $logoText | Write-Host
             }

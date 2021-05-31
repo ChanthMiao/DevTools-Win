@@ -36,14 +36,31 @@ function Add-Path {
         [Parameter(ParameterSetName = "Basic")]
         [Parameter(ParameterSetName = "Advanced")]
         [switch]
+        $LiteralPath,
+        [Parameter(ParameterSetName = "Basic")]
+        [Parameter(ParameterSetName = "Advanced")]
+        [switch]
         $PassThru
     )
 
     begin {
-        $_paths = New-Object 'System.Collections.Generic.List[string]'
+        $_paths = [System.Collections.Generic.List[string]]@()
         $TargetValue = [System.Environment]::GetEnvironmentVariable($Target)
         if ($TargetValue) {
-            $TargetValue.Split(';').ForEach( { $_paths.Add($_) })
+            $pcs = $TargetValue.Split([System.IO.Path]::PathSeparator)
+            foreach ($p in $pcs) {
+                if ($_paths.Contains($p)) {
+                    Continue
+                }
+                if (-not [System.IO.Path]::IsPathRooted($p)) {
+                    $p = $p.TrimEnd([System.IO.Path]::DirectorySeparatorChar)
+                    $p = $p.TrimEnd([System.IO.Path]::AltDirectorySeparatorChar)
+                    if ($_paths.Contains($p)) {
+                        Continue
+                    }
+                }
+                $_paths.Add($p)
+            }
         }
         if ($PSCmdlet.ParameterSetName -eq 'Advanced') {
             $sub = if ($Index -lt 0) {
@@ -61,6 +78,10 @@ function Add-Path {
 
     process {
         foreach ($pa in $Path) {
+            if (-not $LiteralPath) {
+                # Get absolute path.
+                $pa = [System.IO.Path]::GetFullPath($pa.Trim())
+            }
             if (!$Force -and ![System.IO.Directory]::Exists($pa)) {
                 Write-Warning "Directory $pa does not exist, skiped!"
                 Continue
@@ -69,8 +90,9 @@ function Add-Path {
                 Write-Verbose "Directory $pa is already in Env:\$Target, skiped!"
                 Continue
             }
-            if ($pa.EndsWith([System.IO.Path]::DirectorySeparatorChar) -and ![System.IO.Path]::IsPathRooted($pa)) {
+            if (-not [System.IO.Path]::IsPathRooted($pa)) {
                 $pa = $pa.TrimEnd([System.IO.Path]::DirectorySeparatorChar)
+                $pa = $pa.TrimEnd([System.IO.Path]::AltDirectorySeparatorChar)
                 if ($_paths.Contains($pa)) {
                     Write-Verbose "Directory $pa is already in Env:\$Target, skiped!"
                     Continue
