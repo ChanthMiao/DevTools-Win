@@ -30,6 +30,10 @@ function Get-ItemSize {
             else {
                 $meta.Length
             }
+            if (-not $s) {
+                # $s May be $null, if target path is an empty directory.
+                $s = 0
+            }
             if ($Sum) {
                 $_Sum += $s
             }
