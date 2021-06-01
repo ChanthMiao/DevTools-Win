@@ -2,6 +2,7 @@ function Remove-Path {
     [CmdletBinding()]
     param (
         [Parameter(
+            ParameterSetName = 'Value',
             Position = 0,
             Mandatory = $true,
             ValueFromPipeline = $true,
@@ -11,17 +12,22 @@ function Remove-Path {
         [Alias('FullName')]
         [string[]]
         $Path,
-        [Parameter(, Position = 1)]
+        [Parameter(ParameterSetName = 'Script', Position = 0, Mandatory = $true)]
+        [scriptblock]
+        $Match,
+        [Parameter(ParameterSetName = 'Value' , Position = 1)]
+        [Parameter(ParameterSetName = 'Script' , Position = 1)]
         [string]
         $Target = 'Path',
-        [Parameter()]
+        [Parameter(ParameterSetName = 'Value')]
         [ValidateSet('Default', 'First', 'Last', 'All')]
         [string]
         $Mode,
-        [Parameter()]
+        [Parameter(ParameterSetName = 'Value')]
         [switch]
         $LiteralPath,
-        [Parameter()]
+        [Parameter(ParameterSetName = 'Value')]
+        [Parameter(ParameterSetName = 'Script')]
         [switch]
         $PassThru
     )
@@ -60,6 +66,9 @@ function Remove-Path {
     }
 
     end {
+        if ($PSCmdlet.ParameterSetName -eq 'Script') {
+            $_paths = $_paths.Where( { !$Match.Invoke($_) })
+        }
         [System.Environment]::SetEnvironmentVariable($Target, [string]::Join([System.IO.Path]::PathSeparator, $_paths))
         if ($PassThru) {
             $_paths | Write-Output
