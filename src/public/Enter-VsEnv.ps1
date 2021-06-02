@@ -14,7 +14,7 @@ function Enter-VsEnv {
         [switch]
         $AllowPrerelease,
         [Parameter(ParameterSetName = "InstanceId", Position = 0, Mandatory = $true)]
-        [ValidatePattern('^[0-9a-z]$')]
+        [ValidatePattern('^[0-9a-z]{8}$')]
         [Alias('id')]
         [string]
         $InstanceId,
