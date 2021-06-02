@@ -1,13 +1,25 @@
-# TODO: refactor it.
 function Enter-VsEnv {
-    [CmdletBinding(DefaultParameterSetName = "Latest")]
+    [CmdletBinding(DefaultParameterSetName = 'Select')]
     param (
-        [Parameter(ParameterSetName = "InstanceId", Position = 0)]
-        [ValidateScript( { Test-Path $_ -PathType Container })]
-        [Alias('i', 'Id')]
+        [Parameter(ParameterSetName = "Select", Position = 0)]
+        [ValidateSet('2017', '2019')]
+        [string]
+        $Version,
+        [Parameter(ParameterSetName = "Select")]
+        [ValidateSet('Community', 'Professional', 'Enterprise', 'BuildTools')]
+        [string]
+        $Product,
+        [Parameter(ParameterSetName = "Select")]
+        [Parameter(ParameterSetName = "List")]
+        [switch]
+        $AllowPrerelease,
+        [Parameter(ParameterSetName = "InstanceId", Position = 0, Mandatory = $true)]
+        [ValidatePattern('^[0-9a-z]$')]
+        [Alias('id')]
         [string]
         $InstanceId,
-        [Parameter(ParameterSetName = "InstallPath", Position = 0)]
+        [Parameter(ParameterSetName = "InstallPath", Position = 0, Mandatory = $true)]
+        [ValidateScript( { [System.IO.Directory]::Exists($_) })]
         [Alias('p', 'Path')]
         [string]
         $InstallPath,
@@ -15,152 +27,221 @@ function Enter-VsEnv {
         [Alias('l')]
         [switch]
         $List,
-        [Parameter(ParameterSetName = "Latest", Position = 0)]
-        [Parameter(ParameterSetName = "InstanceId", Position = 1)]
-        [Parameter(ParameterSetName = "InstallPath", Position = 1)]
-        [Parameter(ParameterSetName = "Advanced", Position = 0)]
-        [ValidateSet("amd64", "x86")]
-        [Alias('a')]
+        [Parameter(ParameterSetName = "Select")]
+        [Parameter(ParameterSetName = "InstanceId")]
+        [Parameter(ParameterSetName = "InstallPath")]
+        [switch]
+        $NoSubShell,
+        [Parameter(ParameterSetName = "Select")]
+        [Parameter(ParameterSetName = "InstanceId")]
+        [Parameter(ParameterSetName = "InstallPath")]
+        [ValidateSet('x86', 'amd64', 'arm', 'arm64')]
         [string]
         $Arch,
-        [Parameter(ParameterSetName = "Advanced", Position = 1)]
-        [ValidateSet("2017", "2019")]
-        [Alias('v')]
-        [string]
-        $Version,
-        [Parameter(ParameterSetName = "Advanced", Position = 2)]
-        [ValidateSet("Community", "Professional", "Enterprise")]
-        [Alias('e')]
-        [string]
-        $Edition,
-        [Parameter(ParameterSetName = "Latest")]
+        [Parameter(ParameterSetName = "Select")]
         [Parameter(ParameterSetName = "InstanceId")]
         [Parameter(ParameterSetName = "InstallPath")]
-        [Parameter(ParameterSetName = "Advanced")]
+        [ValidateSet('x86', 'amd64')]
         [string]
-        $CmdArgs,
-        [Parameter(ParameterSetName = "Latest")]
+        $HostArch,
+        [Parameter(ParameterSetName = "Select")]
+        [Parameter(ParameterSetName = "InstanceId")]
+        [Parameter(ParameterSetName = "InstallPath")]
+        [ValidatePattern('^(10\.0|8\.1)(\.\d+){1,3}|none$')]
+        [string]
+        $WinSDK,
+        [Parameter(ParameterSetName = "Select")]
+        [Parameter(ParameterSetName = "InstanceId")]
+        [Parameter(ParameterSetName = "InstallPath")]
+        [ValidateSet('Desktop', 'UWP')]
+        [string]
+        $AppType,
+        [Parameter(ParameterSetName = "Select")]
+        [Parameter(ParameterSetName = "InstanceId")]
+        [Parameter(ParameterSetName = "InstallPath")]
+        [ValidatePattern('^14(\.\d+){1,3}$')]
+        [string]
+        $VC,
+        [Parameter(ParameterSetName = "Select")]
+        [Parameter(ParameterSetName = "InstanceId")]
+        [Parameter(ParameterSetName = "InstallPath")]
+        [switch]
+        $UseSpectreLibs,
+        [Parameter(ParameterSetName = "Select")]
+        [Parameter(ParameterSetName = "InstanceId")]
+        [Parameter(ParameterSetName = "InstallPath")]
+        [switch]
+        $Silent,
+        [Parameter(ParameterSetName = "Select")]
         [Parameter(ParameterSetName = "InstanceId")]
         [Parameter(ParameterSetName = "InstallPath")]
         [Parameter(ParameterSetName = "List")]
-        [Parameter(ParameterSetName = "Advanced")]
-        [switch]
-        $ExcludePrerelease,
-        [Parameter(ParameterSetName = "Latest")]
-        [Parameter(ParameterSetName = "InstanceId")]
-        [Parameter(ParameterSetName = "InstallPath")]
-        [Parameter(ParameterSetName = "Advanced")]
-        [Alias('s')]
-        [switch]
-        $NoLogo,
-        [Parameter(ParameterSetName = "Latest")]
-        [Parameter(ParameterSetName = "InstanceId")]
-        [Parameter(ParameterSetName = "InstallPath")]
-        [Parameter(ParameterSetName = "List")]
-        [Parameter(ParameterSetName = "Advanced")]
         [ValidateScript( {
                 [System.IO.Path]::GetFileNameWithoutExtension((Get-Command $_)) -eq 'vswhere'
             })]
         [string]
         $VsWherePath = (Get-Config -Name 'VsWhere')
     )
-    
-    begin {
-        $vswhereCmd = "& `"$VsWherePath`"  -format json"
-        switch ($PSCmdlet.ParameterSetName) {
-            "Latest" { $vswhereCmd += " -latest" ; break }
-            "InstanceId" { $vswhereCmd += " -all" ; break }
-            "InstallPath" { $vswhereCmd += " -path $InstallPath" ; break }
-            Default { $vswhereCmd += " -all -sort" }
-        }
-        if (-not $ExcludePrerelease -and ($PSCmdlet.ParameterSetName -ne "InstallPath")) {
-            $vswhereCmd += " -prerelease"
-        }
-    }
 
     end {
-        if ($PSCmdlet.ParameterSetName -eq "List") {
-            (Invoke-Expression $vswhereCmd | ConvertFrom-Json) | Select-Object instanceId, displayName, installationName, installationPath | Format-List
-            return
-        }
-        $basePath = switch ($PSCmdlet.ParameterSetName) {
-            "InsctanceId" { (Invoke-Expression $vswhereCmd | ConvertFrom-Json) | Where-Object { $_.instanceId -eq $InstanceId } | Select-Object -ExpandProperty installationPath ; break }
-            "Advanced" {
-                $_sets = Invoke-Expression $vswhereCmd
-                if ($Version) {
-                    $_sets = Where-Object { $_.catalog_productLineVersion -eq $Version } -InputObject $_sets
+        if (!$NoSubShell -and !$Env:DTW_VS_INSUBSHELL -and !$List) {
+            $SelfInvokeCmdBuilder = [System.Collections.Generic.List[string]]@($PSCmdlet.MyInvocation.InvocationName)
+            foreach ($k in $PSBoundParameters.Keys) {
+                $v = $PSBoundParameters.Item($k)
+                if (($v.GetType() -eq [switch]) -and $v) {
+                    $SelfInvokeCmdBuilder.Add("-$k")
                 }
-                if ($Edition) {
-                    $_sets = Where-Object { $_.productId -eq ("Microsoft.VisualStudio.Product.$Edition") } -InputObject $_sets
+                else {
+                    $SelfInvokeCmdBuilder.Add("-$k $v")
                 }
-                $_sets | Select-Object -ExpandProperty installationPath -First
-                break
             }
-            Default { (Invoke-Expression $vswhereCmd | ConvertFrom-Json) | Select-Object  -ExpandProperty installationPath }
-        }
-        if (-not $basePath) {
-            Write-Error "Could not find an installation of Visual Studio with given arguments!" -Category ObjectNotFound
+            $SelfInvokeCmdBuilder.Add('-NoSubShell')
+            $SelfInvokeCmd = [string]::Join(' ', $SelfInvokeCmdBuilder)
+            $SelfModulePath = $PSCmdlet.MyInvocation.MyCommand.Module.Path
+            Write-Host 'Launching subshell in virtual environment...' -ForegroundColor Green
+            if ($PSEdition -eq 'Core') {
+                pwsh -NoExit -NoLogo -Command "& { Import-Module $SelfModulePath; `$Env:DTW_VS_INSUBSHELL = 1; $SelfInvokeCmd }"
+            }
+            else {
+                powershell -NoExit -NoLogo -Command "& { Import-Module $SelfModulePath; `$Env:DTW_VS_INSUBSHELL = 1; $SelfInvokeCmd }"
+            }
             return
         }
-        $cmdbat = Join-Path $basePath "Common7\Tools\VsDevCmd.bat"
-        if (-not (Get-Command $cmdbat | Split-Path -Leaf) -eq 'VsDevCmd.bat' ) {
-            Write-Error "Could not find VsDevCmd.bat!" -Category ObjectNotFound
+        $QueryBuilder = [System.Collections.Generic.List[string]]@()
+        $QueryBuilder.Add("& `"$VsWherePath`"")
+        if ($AllowPrerelease) {
+            $QueryBuilder.Add('-prerelease')
+        }
+        if ($Product) {
+            $QueryBuilder.Add("-products Microsoft.VisualStudio.Product.$Product")
+        }
+        else {
+            $QueryBuilder.Add('-products *')
+        }
+        if ($Version) {
+            switch ($Version) {
+                '2019' { $QueryBuilder.Add('-version "[16.0,17.0)"') ; break }
+                '2017' { $QueryBuilder.Add('-version "[15.0,16.0)"') ; break }
+                Default {}
+            }
+        }
+        if ($InstallPath) {
+            $QueryBuilder.Add("-path $InstallPath")
+        }
+        if ($InstanceId -or $List) {
+            $QueryBuilder.Add('-all -sort')
+        }
+        else {
+            $QueryBuilder.Add('-latest')
+        }
+        $QueryBuilder.Add('-format json -nologo -utf8')
+        $Query = [string]::Join(' ', $QueryBuilder)
+        Write-Debug $Query
+        $Results = (Invoke-Expression $Query | ConvertFrom-Json)
+        if ($List) {
+            $Results | Select-Object instanceId, displayName, installationName, installationPath | Format-List
             return
         }
-        $cmdbatCall = "&`"$cmdbat`" -startdir=none"
+        if (-not $Results) {
+            Write-Error "Failed to find required visualstudio instance."
+            return
+        }
+        if ($InstanceId) {
+            $Results = ($Results | Where-Object instanceId -EQ $InstanceId)
+            if (-not $Results) {
+                Write-Error "Failed to find required visualstudio instance."
+                return
+            }
+        }
+        $InstallPath = $Results.installationPath
+        $VsDevCmdFile = [System.IO.Path]::Combine($InstallPath, "Common7", "Tools", "VsDevCmd.bat")
+        if (-not ([System.IO.Path]::GetFileNameWithoutExtension((Get-Command $VsDevCmdFile)) -eq 'VsDevCmd')) {
+            Write-Error 'Failed to find VsDevCmd.bat.'
+            return
+        }
+        $VsDevCmdBuilder = [System.Collections.Generic.List[string]]@()
+        $VsDevCmdBuilder.Add("& `"$VsDevCmdFile`" -startdir=none")
+        if (-not $Arch) {
+            $Arch = switch ($Env:PROCESSOR_ARCHITECTURE) {
+                'AMD64' { 'amd64' }
+                'X86' { 'x86' }
+                Default { '' }
+            }
+        }
         if ($Arch) {
-            $cmdbatCall += " -arch=$Arch"
+            $VsDevCmdBuilder.Add("-arch=$Arch")
         }
-        if ($NoLogo) {
-            $cmdbatCall += " -no_logo"
+        if (-not $HostArch) {
+            $HostArch = switch ($Env:PROCESSOR_ARCHITECTURE) {
+                'AMD64' { 'amd64' }
+                'X86' { 'x86' }
+                Default { '' }
+            }
         }
-        if ($CmdArgs) {
-            $cmdbatCall += " $CmdArgs"
+        if ($HostArch) {
+            $VsDevCmdBuilder.Add("-host_arch=$HostArch")
         }
-        if (-not $NoLogo -and $cmdbatCall.Contains("-no_logo")) {
-            $cmdbatCall = $cmdbatCall -replace "-no_logo", ""
+        if ($WinSDK) {
+            $VsDevCmdBuilder.Add("-winsdk=$WinSDK")
         }
-        if ($cmdbatCall.Contains("-help")) {
-            Invoke-Expression $cmdbatCall | Write-Host
-            return
+        if ($AppType) {
+            $VsDevCmdBuilder.Add("-app_platform=$AppType")
         }
-        if ($cmdbatCall.Contains("-test")) {
-            $cmdbatCall = $cmdbatCall -replace "-test", ""
-            Write-Warning "Parameter '-test' not supported currently. Drop it."
+        if ($VC) {
+            $VsDevCmdBuilder.Add("-vcvars_ver=$VC")
         }
-        Write-Debug $cmdbatCall
-        [System.Collections.Generic.List[string]]$logoText = @()
-        Invoke-Expression $cmdbatCall | ForEach-Object -Begin { 
-            $Env:VSCMD_SKIP_SENDTELEMETRY = "1"
-            $Env:VSCMD_BANNER_SHELL_NAME_ALT = "Developer PowerShell"
-            $Env:VSCMD_DEBUG = "2" 
-        } -Process {
+        if ($UseSpectreLibs) {
+            $VsDevCmdBuilder.Add('-vcvars_spectre_libs=spectre')
+        }
+        if ($Silent) {
+            $VsDevCmdBuilder.Add('-no_logo')
+        }
+        else {
+            $logoText = [System.Collections.Generic.List[string]]@()
+        }
+        $VsDevCmd = [string]::Join(' ', $VsDevCmdBuilder)
+        Write-Debug $VsDevCmd
+        $Env:VSCMD_SKIP_SENDTELEMETRY = "1"
+        $Env:VSCMD_BANNER_SHELL_NAME_ALT = "Developer PowerShell"
+        $Env:VSCMD_DEBUG = "2"
+        Invoke-Expression $VsDevCmd | ForEach-Object -Process {
             $line = $_
             switch -Regex ($line) {
                 "^\[DEBUG:(?'key'.*?)\] (?'value'.*?)$" { Write-Debug "[$($Matches.key)] $($Matches.value)" ; break }
                 "^\[ERROR:(?'key'.*?)\] (?'value'.*?)$" { Write-Error "[$($Matches.key)] $($Matches.value)" ; break }
                 "(?'key'[^=].*?)=(?'value'.*)$" {
                     if ($Matches.key -in @('Path', 'INCLUDE', 'LIB', 'LIBPATH')) {
-                        $_sc = [System.Collections.Generic.HashSet[string]]($Matches.value.Split([System.IO.Path]::PathSeparator))
-                        $_v = [string]::Join([System.IO.Path]::PathSeparator, $_sc)
-                        [System.Environment]::SetEnvironmentVariable($Matches.key, $_v)
+                        $_VS_ADDED = [System.Environment]::GetEnvironmentVariable("_DTW_VS_$($Matches.key)_ADDED")
+                        if ($_VS_ADDED) {
+                            $_VS_ADDED.Split([System.IO.Path]::PathSeparator) | Remove-Path -Target $Matches.key -Mode 'All'
+                        }
+                        else {
+                            $Original_Path = [System.Environment]::GetEnvironmentVariable($Matches.Key)
+                            if ($Original_Path) {
+                                $_new_path_set = [System.Collections.Generic.HashSet[string]]($Matches.value.Split([System.IO.Path]::PathSeparator))
+                                $_new_path_set.ExceptWith($Original_Path.Split([System.IO.Path]::PathSeparator))
+                                $_VS_ADDED = [string]::Join([System.IO.Path]::PathSeparator, $_new_path_set)
+                                [System.Environment]::SetEnvironmentVariable("_DTW_VS_$($Matches.key)_ADDED", $_VS_ADDED)
+                            }                            
+                        }
                     }
-                    else {
-                        [System.Environment]::SetEnvironmentVariable($Matches.key, $Matches.value)
-                    }
+                    [System.Environment]::SetEnvironmentVariable($Matches.key, $Matches.value)
                     break 
                 }
-                "^\*\*.*$" { $logoText.Add($line) ; break }
+                "^\*\*.*$" {
+                    if (-not $Silent) {
+                        $logoText.Add($line)
+                        break 
+                    }
+                }
                 Default { Write-Verbose $line }
             }
-        } -End {
-            [System.Environment]::SetEnvironmentVariable('VSCMD_SKIP_SENDTELEMETRY', $null)
-            [System.Environment]::SetEnvironmentVariable('VSCMD_BANNER_SHELL_NAME_ALT', $null)
-            [System.Environment]::SetEnvironmentVariable('VSCMD_DEBUG', $null)
-
-            if (-not $NoLogo) {
-                $logoText | Write-Host
-            }
+        }
+        [System.Environment]::SetEnvironmentVariable('VSCMD_SKIP_SENDTELEMETRY', $null)
+        [System.Environment]::SetEnvironmentVariable('VSCMD_BANNER_SHELL_NAME_ALT', $null)
+        [System.Environment]::SetEnvironmentVariable('VSCMD_DEBUG', $null)
+        if (-not $Silent) {
+            $logoText | Write-Host
         }
     }
 }

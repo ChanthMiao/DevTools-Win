@@ -57,7 +57,7 @@ function Remove-Path {
                 }
             }
             switch ($Mode) {
-                'All' { $_paths.RemoveAll($pa) | Out-Null; break }
+                'All' { $_paths.RemoveAll({param($_p) $_p -eq $pa}) | Out-Null; break }
                 'Last' { $_paths.RemoveAt($_paths.LastIndexOf($pa)); break }
                 'First' { $_paths.Remove($pa) | Out-Null; break }
                 Default { $_paths.Remove($pa) | Out-Null }
