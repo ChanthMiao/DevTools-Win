@@ -5,7 +5,7 @@ function Read-Config {
         VcpkgRoot = $null;
         Clang     = $null
     }
-    $config_path = [System.IO.Path]::Join($Env:LOCALAPPDATA, "DevTools-Win", "config.json")
+    $config_path = [System.IO.Path]::Combine($Env:LOCALAPPDATA, "DevTools-Win", "config.json")
     if ([System.IO.File]::Exists($config_path)) {
         $json = (Get-Content -Path $config_path -Raw -Encoding utf8 | ConvertFrom-Json)
         if ($json.Proxy) {
