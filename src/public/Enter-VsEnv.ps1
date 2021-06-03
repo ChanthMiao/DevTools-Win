@@ -126,6 +126,7 @@ function Enter-VsEnv {
             }
         }
         if ($InstallPath) {
+            $InstallPath = [System.IO.Path]::GetFullPath($InstallPath)
             $QueryBuilder.Add("-path $InstallPath")
         }
         if ($InstanceId -or $List) {
