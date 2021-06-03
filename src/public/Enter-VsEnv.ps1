@@ -225,16 +225,16 @@ function Enter-VsEnv {
                                 $_new_path_set.ExceptWith($Original_Path.Split([System.IO.Path]::PathSeparator))
                                 $_VS_ADDED = [string]::Join([System.IO.Path]::PathSeparator, $_new_path_set)
                                 [System.Environment]::SetEnvironmentVariable("_DTW_VS_$($Matches.key)_ADDED", $_VS_ADDED)
-                            }                            
+                            }
                         }
                     }
                     [System.Environment]::SetEnvironmentVariable($Matches.key, $Matches.value)
-                    break 
+                    break
                 }
                 "^\*\*.*$" {
                     if (-not $Silent) {
                         $logoText.Add($line)
-                        break 
+                        break
                     }
                 }
                 Default { Write-Verbose $line }
