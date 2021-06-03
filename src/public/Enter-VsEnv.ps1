@@ -109,31 +109,33 @@ function Enter-VsEnv {
         }
         $QueryBuilder = [System.Collections.Generic.List[string]]@()
         $QueryBuilder.Add("& `"$VsWherePath`"")
-        if ($AllowPrerelease) {
-            $QueryBuilder.Add('-prerelease')
-        }
-        if ($Product) {
-            $QueryBuilder.Add("-products Microsoft.VisualStudio.Product.$Product")
-        }
-        else {
-            $QueryBuilder.Add('-products *')
-        }
-        if ($Version) {
-            switch ($Version) {
-                '2019' { $QueryBuilder.Add('-version "[16.0,17.0)"') ; break }
-                '2017' { $QueryBuilder.Add('-version "[15.0,16.0)"') ; break }
-                Default {}
-            }
-        }
         if ($InstallPath) {
             $InstallPath = [System.IO.Path]::GetFullPath($InstallPath)
-            $QueryBuilder.Add("-path $InstallPath")
-        }
-        if ($InstanceId -or $List) {
-            $QueryBuilder.Add('-all -sort')
+            $QueryBuilder.Add("-path `"$InstallPath`"")
         }
         else {
-            $QueryBuilder.Add('-latest')
+            if ($AllowPrerelease) {
+                $QueryBuilder.Add('-prerelease')
+            }
+            if ($Product) {
+                $QueryBuilder.Add("-products Microsoft.VisualStudio.Product.$Product")
+            }
+            else {
+                $QueryBuilder.Add('-products *')
+            }
+            if ($Version) {
+                switch ($Version) {
+                    '2019' { $QueryBuilder.Add('-version "[16.0,17.0)"') ; break }
+                    '2017' { $QueryBuilder.Add('-version "[15.0,16.0)"') ; break }
+                    Default {}
+                }
+            }
+            if ($InstanceId -or $List) {
+                $QueryBuilder.Add('-all -sort')
+            }
+            else {
+                $QueryBuilder.Add('-latest')
+            }
         }
         $QueryBuilder.Add('-format json -nologo -utf8')
         $Query = [string]::Join(' ', $QueryBuilder)
