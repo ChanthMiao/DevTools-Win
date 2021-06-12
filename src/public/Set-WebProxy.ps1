@@ -58,8 +58,8 @@ function Set-WebProxy {
                 $_proxy.BypassList = $ByPassList
             }
         }
-        $Env:HTTP_PROXY = $_proxy.Address
-        $Env:HTTPS_PROXY = $_proxy.Address
+        $Env:HTTP_PROXY = $_proxy.Address.ToString().TrimEnd('/')
+        $Env:HTTPS_PROXY = $Env:HTTP_PROXY
         # Not standardized.
         #if ($_proxy.BypassList) {
         #    $Env:NO_PROXY = (($_proxy.BypassList -join ',') -replace ';', '')
