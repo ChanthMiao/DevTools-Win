@@ -207,26 +207,28 @@ function Enter-VsEnv {
         $Env:VSCMD_SKIP_SENDTELEMETRY = "1"
         $Env:VSCMD_BANNER_SHELL_NAME_ALT = "Developer PowerShell"
         $Env:VSCMD_DEBUG = "2"
+        #clean previous added paths.
+        foreach ($key in @('Path', 'INCLUDE', 'LIB', 'LIBPATH')) {
+            $_VS_ADDED = [System.Environment]::GetEnvironmentVariable("_DTW_VS_${key}_ADDED")
+            if ($_VS_ADDED) {
+                $_VS_ADDED.Split([System.IO.Path]::PathSeparator) | Remove-Path -Target $key -Mode 'All' -LiteralPath
+                [System.Environment]::SetEnvironmentVariable("_DTW_VS_${key}_ADDED", $null)
+            }
+        }
         Invoke-Expression $VsDevCmd | ForEach-Object -Process {
             $line = $_
             switch -Regex ($line) {
                 "^\[DEBUG:(?'key'.*?)\] (?'value'.*?)$" { Write-Debug "[$($Matches.key)] $($Matches.value)" ; break }
                 "^\[ERROR:(?'key'.*?)\] (?'value'.*?)$" { Write-Error "[$($Matches.key)] $($Matches.value)" ; break }
                 "(?'key'[^=].*?)=(?'value'.*)$" {
-                    if ($Matches.key -in @('Path', 'INCLUDE', 'LIB', 'LIBPATH')) {
-                        $_VS_ADDED = [System.Environment]::GetEnvironmentVariable("_DTW_VS_$($Matches.key)_ADDED")
-                        if ($_VS_ADDED) {
-                            $_VS_ADDED.Split([System.IO.Path]::PathSeparator) | Remove-Path -Target $Matches.key -Mode 'All'
+                    if ($Matches.key -in @('Path', 'INCLUDE', 'LIB', 'LIBPATH')) {                       
+                        $_new_path_set = [System.Collections.Generic.HashSet[string]]($Matches.value.Split([System.IO.Path]::PathSeparator))
+                        $Original_Path = [System.Environment]::GetEnvironmentVariable($Matches.Key)
+                        if ($Original_Path) {
+                            $_new_path_set.ExceptWith($Original_Path.Split([System.IO.Path]::PathSeparator))
                         }
-                        else {
-                            $Original_Path = [System.Environment]::GetEnvironmentVariable($Matches.Key)
-                            if ($Original_Path) {
-                                $_new_path_set = [System.Collections.Generic.HashSet[string]]($Matches.value.Split([System.IO.Path]::PathSeparator))
-                                $_new_path_set.ExceptWith($Original_Path.Split([System.IO.Path]::PathSeparator))
-                                $_VS_ADDED = [string]::Join([System.IO.Path]::PathSeparator, $_new_path_set)
-                                [System.Environment]::SetEnvironmentVariable("_DTW_VS_$($Matches.key)_ADDED", $_VS_ADDED)
-                            }
-                        }
+                        $_VS_ADDED = [string]::Join([System.IO.Path]::PathSeparator, $_new_path_set)
+                        [System.Environment]::SetEnvironmentVariable("_DTW_VS_$($Matches.key)_ADDED", $_VS_ADDED)
                     }
                     [System.Environment]::SetEnvironmentVariable($Matches.key, $Matches.value)
                     break
