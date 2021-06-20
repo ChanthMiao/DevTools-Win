@@ -23,8 +23,8 @@ function Enable-Clang {
     $clangIncludeDir = [System.IO.Path]::Combine($llvmInstallDir, "lib", "clang", $clangVersion, "include")
     $clangLibDir = [System.IO.Path]::Combine($llvmInstallDir, "lib", "clang", $clangVersion, "lib", "windows")
     # Add resources paths to environment variables.
-    $llvmIncludeDir, $clangIncludeDir | Add-Path -Target 'INCLUDE'
-    $llvmLibDir, $clangLibDir | Add-Path -Target 'LIB'
+    $llvmIncludeDir, $clangIncludeDir | Where-Object { [System.IO.Directory]::Exists($_) } | Add-Path -Target 'INCLUDE' -Verbose:$isVerbose
+    $llvmLibDir, $clangLibDir | Where-Object { [System.IO.Directory]::Exists($_) } | Add-Path -Target 'LIB' -Verbose:$isVerbose
     # Make sure clang in path.
     Add-Path $clangInstallDir -Verbose:$isVerbose
 }
