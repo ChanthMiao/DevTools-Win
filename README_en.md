@@ -83,6 +83,7 @@ The custom configuration is stored in the config.json file (comments not support
     "VsWhere": "C:\\Program Files (x86)\\Microsoft Visual Studio\\Installer\\vswhere.exe", // Specify the vswhere program path, which can be overridden by $Env:VSWHERE_PATH.
     "VcpkgRoot": "C:\\Users\\abc\\source\\repos\\vcpkg", // Specify the root directory of vcpkg, which can be overridden by $Env:VCPKG_ROOT. The default value is empty.
     "Clang": "C:\\Users\\abc\\scoop\\shims\\clang.ps1", // Specify the clang path, which can be overridden by $Env:CLANG_PATH. The default value is empty
+    "PyRoot": "C:\\Users\\abc\\AppData\\Local\\Programs\\Python\\Python38", // Specify the python installpath，which can be overridden by $Env:Py_ROOT. The default value is auto-detected.
 }
 ```
 

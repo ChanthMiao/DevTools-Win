@@ -83,6 +83,7 @@ ls .\lib
     "VsWhere": "C:\\Program Files (x86)\\Microsoft Visual Studio\\Installer\\vswhere.exe", // 指定vswhere程序路径，可被$Env:VSWHERE_PATH覆盖
     "VcpkgRoot": "C:\\Users\\abc\\source\\repos\\vcpkg", // 指定 vcpkg 根目录，可被$Env:VCPKG_ROOT覆盖，默认为空
     "Clang": "C:\\Users\\abc\\scoop\\shims\\clang.ps1", // 指定clang路径，可被$Env:CLANG_PATH覆盖，默认为空
+    "PyRoot": "C:\\Users\\abc\\AppData\\Local\\Programs\\Python\\Python38", // 指定 Python 根目录，可被$Env:Py_ROOT覆盖，默认自动检测
 }
 ```
 
