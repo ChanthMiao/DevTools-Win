@@ -20,7 +20,7 @@ function Start-Log {
         if (-not [System.IO.File]::Exists($LogFile)) {
             New-Item -Path $LogFile -ItemType File -Force
         }
-        Start-Transcript -Path $LogFile -Append -IncludeInvocationHeader -UseMinimalHeader
+        Start-Transcript -Path $LogFile -Append -IncludeInvocationHeader -UseMinimalHeader | Out-Null
     }
 }
 
