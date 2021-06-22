@@ -26,6 +26,7 @@ if ([System.Environment]::OSVersion.Platform -eq [System.PlatformID]::Win32NT) {
     . $PSScriptRoot\src\public\Set-WebProxy.ps1
     . $PSScriptRoot\src\public\Clear-WebProxy.ps1
     . $PSScriptRoot\src\public\Get-ItemSize.ps1
+    . $PSScriptRoot\src\public\Enable-Python.ps1
     if ($Env:DevTools_UnSupported_Functions) {
         # Override some functions to hide them.
         $ufns = $Env:DevTools_UnSupported_Functions -split ';'

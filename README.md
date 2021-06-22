@@ -26,6 +26,7 @@
 |     Start-Log     | salg  | 记录当前 Powershell 会话或脚本输出                |
 |     Stop-Log      | splg  | 停止记录当前 Powershell 会话或脚本输出            |
 |  New-RandString   |  nrs  | 生成随机字符串                                    |
+|   Enable-Python   |  epy  | 切换当前会话的Python环境                          |
 
 ## 命令详细文档
 

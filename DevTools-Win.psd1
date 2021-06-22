@@ -12,7 +12,7 @@
     RootModule             = 'DevTools-Win.psm1'
 
     # Version number of this module.
-    ModuleVersion          = '1.0.8'
+    ModuleVersion          = '1.0.9'
 
     # Supported PSEditions
     CompatiblePSEditions   = @('Core', "Desktop")
@@ -73,6 +73,7 @@
         'Add-Path',
         'Clear-WebProxy',
         'Enable-Clang',
+        'Enable-Python',
         'Enable-Vcpkg',
         'Enter-VsEnv',
         'Format-ItemSize',
@@ -99,6 +100,7 @@
         'apa',
         'clwp',
         'ecla',
+        'epy',
         'etvs',
         'evpg',
         'fis',

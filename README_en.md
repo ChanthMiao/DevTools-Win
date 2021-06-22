@@ -26,6 +26,7 @@ A collection of Powershell scripts for personal use under Windows, which can eff
 |     Start-Log     | salg  | Start recording the current Powershell session or script output                              |
 |     Stop-Log      | splg  | Stop recording the current Powershell session or script output                               |
 |  New-RandString   |  nrs  | Generate random string                                                                       |
+|   Enable-Python   |  epy  | Switch the Python environment of the current session                                         |
 
 ## Document
 

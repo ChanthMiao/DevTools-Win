@@ -3,7 +3,8 @@ function Read-Config {
         Proxy     = $null;
         VsWhere   = "${env:ProgramFiles(x86)}\Microsoft Visual Studio\Installer\vswhere.exe";
         VcpkgRoot = $null;
-        Clang     = $null
+        Clang     = $null;
+        $PyRoot   = $null;
     }
     $config_path = [System.IO.Path]::Combine($Env:LOCALAPPDATA, "DevTools-Win", "config.json")
     if ([System.IO.File]::Exists($config_path)) {
@@ -19,6 +20,9 @@ function Read-Config {
         }
         if ($json.Clang) {
             $DevToolsConf.Clang = $json.Clang
+        }
+        if ($json.PyRoot) {
+            $DevToolsConf.PyRoot = $json.PyRoot
         }
     }
     Set-Variable -Name DevToolsConf -Value $DevToolsConf -Scope Script -Force
