@@ -84,7 +84,7 @@ function Enter-VsEnv {
     )
 
     end {
-        if (!$NoSubShell -and !$Env:DTW_VS_INSUBSHELL -and !$List) {
+        if (!$NoSubShell -and !$Env:DTW_INSUBSHELL -and !$Env:DTW_NOSUBSHELL -and !$List) {
             $SelfInvokeCmdBuilder = [System.Collections.Generic.List[string]]@($PSCmdlet.MyInvocation.InvocationName)
             foreach ($k in $PSBoundParameters.Keys) {
                 $v = $PSBoundParameters.Item($k)
@@ -100,12 +100,15 @@ function Enter-VsEnv {
             $SelfModulePath = $PSCmdlet.MyInvocation.MyCommand.Module.Path
             Write-Host 'Launching subshell in virtual environment...' -ForegroundColor Green
             if ($PSEdition -eq 'Core') {
-                pwsh -NoExit -NoLogo -Command "& { Import-Module $SelfModulePath; `$Env:DTW_VS_INSUBSHELL = 1; $SelfInvokeCmd }"
+                pwsh -NoExit -NoLogo -Command "& { Import-Module $SelfModulePath; `$Env:DTW_INSUBSHELL = 1; $SelfInvokeCmd }"
             }
             else {
-                powershell -NoExit -NoLogo -Command "& { Import-Module $SelfModulePath; `$Env:DTW_VS_INSUBSHELL = 1; $SelfInvokeCmd }"
+                powershell -NoExit -NoLogo -Command "& { Import-Module $SelfModulePath; `$Env:DTW_INSUBSHELL = 1; $SelfInvokeCmd }"
             }
             return
+        }
+        if ($NoSubShell) {
+            $Env:DTW_NOSUBSHELL = "1"
         }
         $QueryBuilder = [System.Collections.Generic.List[string]]@()
         $QueryBuilder.Add("& `"$VsWherePath`"")
