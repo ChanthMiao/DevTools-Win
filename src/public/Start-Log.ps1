@@ -15,7 +15,7 @@ function Start-Log {
                 Start-Transcript -OutputDirectory $Env:TEMP -Append -IncludeInvocationHeader -UseMinimalHeader
                 return
             }
-            $LogFile = [System.IO.Path]::Combine($MyInvocation.PSScriptRoot, "logs", [System.IO.Path]::GetFileNameWithoutExtension($MyInvocation.PSCommandPath), "log")
+            $LogFile = [System.IO.Path]::Combine($MyInvocation.PSScriptRoot, "logs", "$([System.IO.Path]::GetFileNameWithoutExtension($MyInvocation.PSCommandPath)).log")
         }
         if (-not [System.IO.File]::Exists($LogFile)) {
             New-Item -Path $LogFile -ItemType File -Force

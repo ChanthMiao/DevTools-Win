@@ -87,8 +87,7 @@ function Send-Notification {
             Register-ObjectEvent -InputObject $job -EventName StateChanged -SourceIdentifier "$jprefix-$(New-RandString)" -Action {
                 if ($EventSubscriber.SourceObject.State -eq 'Completed') {
                     Unregister-Event -SourceIdentifier $EventSubscriber.SourceIdentifier
-                    Remove-Event -SourceIdentifier $EventSubscriber.SourceIdentifier
-                    Remove-Job -Name $EventSubscriber.SourceIdentifier
+                    Remove-Job -Name $EventSubscriber.SourceIdentifier -Force
                     Remove-Job -Id $EventSubscriber.SourceObject.Id | Out-Null
                 }
             } | Out-Null
