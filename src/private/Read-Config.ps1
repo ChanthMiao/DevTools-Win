@@ -4,7 +4,7 @@ function Read-Config {
         VsWhere   = "${env:ProgramFiles(x86)}\Microsoft Visual Studio\Installer\vswhere.exe";
         VcpkgRoot = $null;
         Clang     = $null;
-        $PyRoot   = $null;
+        PyRoot    = $null;
     }
     $config_path = [System.IO.Path]::Combine($Env:LOCALAPPDATA, "DevTools-Win", "config.json")
     if ([System.IO.File]::Exists($config_path)) {
