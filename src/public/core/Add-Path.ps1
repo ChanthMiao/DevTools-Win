@@ -78,25 +78,25 @@ function Add-Path {
 
     process {
         foreach ($pa in $Path) {
-            if (-not $LiteralPath) {
-                # Get absolute path.
-                $pa = [System.IO.Path]::GetFullPath($pa.Trim())
-            }
-            if (!$Force -and ![System.IO.Directory]::Exists($pa)) {
-                Write-Warning "Directory $pa does not exist, skiped!"
+            $pa = $pa.Trim()
+            [string]$formatted_path = [System.IO.Path]::GetFullPath("$pa\", $PSCmdlet.CurrentProviderLocation("FileSystem").ProviderPath)
+            if (!$Force -and ![System.IO.Directory]::Exists($formatted_path)) {
+                Write-Warning "Directory $formatted_path does not exist, skiped!"
                 Continue
             }
-            if ($_paths.Contains($pa)) {
-                Write-Verbose "Directory $pa is already in Env:\$Target, skiped!"
+            if ($_paths.Contains($formatted_path)) {
+                Write-Warning "Directory $formatted_path is already in Env:\$Target, skiped!"
                 Continue
             }
-            if (-not [System.IO.Path]::IsPathRooted($pa)) {
-                $pa = $pa.TrimEnd([System.IO.Path]::DirectorySeparatorChar)
-                $pa = $pa.TrimEnd([System.IO.Path]::AltDirectorySeparatorChar)
-                if ($_paths.Contains($pa)) {
-                    Write-Verbose "Directory $pa is already in Env:\$Target, skiped!"
+            elseif ([System.IO.Path]::GetPathRoot($formatted_path) -ne $formatted_path) {
+                $formatted_path = $formatted_path.TrimEnd([System.IO.Path]::DirectorySeparatorChar)
+                if ($_paths.Contains($formatted_path)) {
+                    Write-Warning "Directory $formatted_path is already in Env:\$Target, skiped!"
                     Continue
                 }
+            }
+            if (-not $LiteralPath) {
+                $pa = $formatted_path
             }
             if ($PSCmdlet.ParameterSetName -eq 'Basic') {
                 if ($Reverse) {

@@ -42,22 +42,22 @@ function Remove-Path {
 
     process {
         foreach ($pa in $Path) {
-            if (-not $LiteralPath) {
-                # Get absolute path.
-                $pa = [System.IO.Path]::GetFullPath($pa.Trim())
-            }
-            if (-not $_paths.Contains($pa)) {
-                if (-not [System.IO.Path]::IsPathRooted($pa)) {
-                    $pa = $pa.TrimEnd([System.IO.Path]::DirectorySeparatorChar)
-                    $pa = $pa.TrimEnd([System.IO.Path]::AltDirectorySeparatorChar)
-                    if (-not $_paths.Contains($pa)) {
-                        Write-Verbose "Directory $pa is not in Env:\$Target, skiped!"
+            $pa = $pa.Trim()
+            [string]$formatted_path = [System.IO.Path]::GetFullPath("$pa\", $PSCmdlet.CurrentProviderLocation("FileSystem").ProviderPath)
+            if (-not $_paths.Contains($formatted_path)) {
+                if ([System.IO.Path]::GetPathRoot($formatted_path) -ne $formatted_path) {
+                    $formatted_path = $formatted_path.TrimEnd([System.IO.Path]::DirectorySeparatorChar)
+                    if (-not $_paths.Contains($formatted_path)) {
+                        Write-Verbose "Directory $formatted_path is not in Env:\$Target, skiped!"
                         Continue
                     }
                 }
             }
+            if (-not $LiteralPath) {
+                $pa = $formatted_path
+            }
             switch ($Mode) {
-                'All' { $_paths.RemoveAll({param($_p) $_p -eq $pa}) | Out-Null; break }
+                'All' { $_paths.RemoveAll( { param($_p) $_p -eq $pa }) | Out-Null; break }
                 'Last' { $_paths.RemoveAt($_paths.LastIndexOf($pa)); break }
                 'First' { $_paths.Remove($pa) | Out-Null; break }
                 Default { $_paths.Remove($pa) | Out-Null }
