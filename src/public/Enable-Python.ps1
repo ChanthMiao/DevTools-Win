@@ -16,7 +16,7 @@ function Enable-Python {
             $Env:DTW_PY_ROOT, $DTW_PyScriptDir | Remove-Path -Verbose:$isVerbose -Mode 'All'
         }
         $PyScriptDir = [System.IO.Path]::Combine($PyRoot, 'Scripts')
-        $PyRoot, $PyScriptDir | Add-Path -Verbose:$isVerbose
+        $PyScriptDir, $PyRoot | Add-Path -Verbose:$isVerbose
         $Env:DTW_PY_ROOT = $PyRoot
     }
 }
