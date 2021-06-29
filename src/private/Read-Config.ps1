@@ -1,7 +1,7 @@
 function Read-Config {
     $DevToolsConf = [ordered]@{
         Proxy     = $null;
-        VsWhere   = "${env:ProgramFiles(x86)}\Microsoft Visual Studio\Installer\vswhere.exe";
+        VsWhere   = $null;
         VcpkgRoot = $null;
         Clang     = $null;
         PyRoot    = $null;

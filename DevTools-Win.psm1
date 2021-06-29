@@ -7,11 +7,15 @@ if ([System.Environment]::OSVersion.Platform -eq [System.PlatformID]::Win32NT) {
     # Private functions.
     . $PSScriptRoot\src\private\Get-WindowsAppId.ps1
     . $PSScriptRoot\src\private\Read-Config.ps1
+    . $PSScriptRoot\src\private\Get-DefaultConfig.ps1
     . $PSScriptRoot\src\private\Get-Config.ps1
     # Public core functions.
     . $PSScriptRoot\src\public\core\Add-Path.ps1
     . $PSScriptRoot\src\public\core\Remove-Path.ps1
     . $PSScriptRoot\src\public\core\New-RandString.ps1
+    . $PSScriptRoot\src\public\core\Get-DtwConfig.ps1
+    . $PSScriptRoot\src\public\core\Set-DtwConfig.ps1
+    . $PSScriptRoot\src\public\core\Show-DtwConfig.ps1
     # Public functions.
     . $PSScriptRoot\src\public\Format-ItemSize.ps1
     . $PSScriptRoot\src\public\Get-TempDir.ps1
