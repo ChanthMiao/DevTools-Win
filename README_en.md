@@ -87,6 +87,8 @@ The custom configuration is stored in the config.json file (comments not support
 }
 ```
 
+Since v1.1.2, it provides `Get-DrwConfig, Set-DtwConfig` to quickly get/set the configuration. If you need to make the changes permanent, execute the command `Show-DtwConfig|Out-File $Env:LOCALAPPDATA\DevTools-Win`.
+
 ## Compatibility
 
 This module is a collection of self-use scripts. My personal main use environment is Windows 10 + Powershell Core + Windows Terminal. Before the official release, a certain degree of compatibility adaptation has been carried out for Windows Powershell 5.1, but 100% compatibility is not guaranteed.

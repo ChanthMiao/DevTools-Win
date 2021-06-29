@@ -87,6 +87,8 @@ ls .\lib
 }
 ```
 
+自v1.1.2起，提供`Get-DrwConfig, Set-DtwConfig`快速查/更改配置。如果需要令更改永久生效，执行命令`Show-DtwConfig|Out-File $Env:LOCALAPPDATA\DevTools-Win`。
+
 ## 兼容性
 
 本模块基于自用脚本打包分享。我个人的主要使用环境为 Windows 10 + Powershell Core + Windows Terminal。在正式发布前，已针对 Windows Powershell 5.1 进行了一定程度的兼容性适配，但不保证 100% 兼容。
