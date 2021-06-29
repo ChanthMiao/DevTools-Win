@@ -87,7 +87,7 @@ The custom configuration is stored in the config.json file (comments not support
 }
 ```
 
-Since v1.1.2, it provides `Get-DrwConfig, Set-DtwConfig` to quickly get/set the configuration. If you need to make the changes permanent, execute the command `Show-DtwConfig|Out-File $Env:LOCALAPPDATA\DevTools-Win`.
+Since v1.1.2, it provides `Get-DrwConfig, Set-DtwConfig` to quickly get/set the configuration. If you need to make the changes permanent, execute the command `Show-DtwConfig|Out-File $Env:LOCALAPPDATA\DevTools-Win\config.json`.
 
 ## Compatibility
 
