@@ -65,6 +65,9 @@ function Set-WebProxy {
         #    $Env:NO_PROXY = (($_proxy.BypassList -join ',') -replace ';', '')
         #}
         [System.Net.WebRequest]::DefaultWebProxy = $_proxy
+        if ([System.Environment]::Version -ge [System.Version]"5.0.0") {
+            [System.Net.Http.HttpClient]::DefaultProxy = $_proxy
+        }
         Write-Verbose "Set webproxy as below."
         $_proxy | Write-Verbose
         if ($PassThru) {

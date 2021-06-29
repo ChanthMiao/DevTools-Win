@@ -11,6 +11,9 @@ function Clear-WebProxy {
         Remove-Item Env:\NO_PROXY
     }
     [System.Net.WebRequest]::DefaultWebProxy = [System.Net.GlobalProxySelection]::GetEmptyWebProxy()
+    if ([System.Environment]::Version -ge [System.Version]"5.0.0") {
+        [System.Net.Http.HttpClient]::DefaultProxy = [System.Net.GlobalProxySelection]::GetEmptyWebProxy()
+    }
 }
 
 Set-Alias -Name clwp -Value Clear-WebProxy
