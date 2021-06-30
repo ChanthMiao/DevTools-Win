@@ -87,7 +87,7 @@ ls .\lib
 }
 ```
 
-自v1.1.2起，提供`Get-DrwConfig, Set-DtwConfig`快速查/更改配置。如果需要令更改永久生效，执行命令`Show-DtwConfig|Out-File $Env:LOCALAPPDATA\DevTools-Win\config.json`。
+自v1.1.2起，提供`Get-DrwConfig, Set-DtwConfig`快速查/更改配置。如果需要令更改永久生效，执行命令`Show-DtwConfig|ConvertTo-Json|Out-File $Env:LOCALAPPDATA\DevTools-Win\config.json`。
 
 ## 兼容性
 
