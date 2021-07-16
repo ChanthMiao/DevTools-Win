@@ -28,7 +28,10 @@ if ([System.Environment]::OSVersion.Platform -eq [System.PlatformID]::Win32NT) {
             # Load Microsoft.Windows.SDK.NET.dll and WinRT.Runtime.dll.
             $LocalCswinrtVersion = Get-LocalDllVersion -DllPath "$ModuleRoot\lib\WinRT.Runtime.dll"
             $LocalWdkVersion = Get-LocalDllVersion -DllPath "$ModuleRoot\lib\Microsoft.Windows.SDK.NET.dll"
-            $WdkPattern = if ([System.Environment]::OSVersion.Version -ge [System.Version]"10.0.19041.0") {
+            $WdkPattern = if ([System.Environment]::OSVersion.Version -ge [System.Version]"10.0.20348.0") {
+                "10.0.20348."
+            }
+            elseif ([System.Environment]::OSVersion.Version -ge [System.Version]"10.0.19041.0") {
                 "10.0.19041."
             }
             elseif ([System.Environment]::OSVersion.Version -ge [System.Version]"10.0.18362.0") {
