@@ -7,17 +7,28 @@ function Enable-Python {
                 [System.IO.Path]::GetFileNameWithoutExtension((Get-Command ([System.IO.Path]::Combine($_, "python")))) -eq 'python'
             })]
         [string]
-        $PyRoot = (Get-Config -Name 'PyRoot')
+        $PyRoot
     )
     end {
         [bool]$isVerbose = if ($VerbosePreference -eq "SilentlyContinue") { $false }else { $true }
+        $_PyRoot = if ($PyRoot) {
+            $PyRoot
+        }
+        else {
+            Get-Config -Name 'PyRoot'
+        }
+        if (-not $_PyRoot) {
+            Write-Error 'Python installation not found! operation aborted.'
+            return
+        }
+
         if ($Env:DTW_PY_ROOT) {
             $DTW_PyScriptDir = [System.IO.Path]::Combine($Env:DTW_PY_ROOT, 'Scripts')
             $Env:DTW_PY_ROOT, $DTW_PyScriptDir | Remove-Path -Verbose:$isVerbose -Mode 'All'
         }
-        $PyScriptDir = [System.IO.Path]::Combine($PyRoot, 'Scripts')
-        $PyScriptDir, $PyRoot | Add-Path -Verbose:$isVerbose
-        $Env:DTW_PY_ROOT = $PyRoot
+        $PyScriptDir = [System.IO.Path]::Combine($_PyRoot, 'Scripts')
+        $PyScriptDir, $_PyRoot | Add-Path -Verbose:$isVerbose
+        $Env:DTW_PY_ROOT = $_PyRoot
     }
 }
 

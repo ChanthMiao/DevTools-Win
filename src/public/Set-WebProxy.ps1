@@ -7,7 +7,7 @@ function Set-WebProxy {
         [ValidatePattern("^http://(?:[^:@]+:(?:[^@:]|\\:|\\@)+@)?([^:@]+|\[[:0-9a-fA-F]+\])(:\d+)?/?$")]
         [Alias("P")]
         [string]
-        $Proxy = (Get-Config -Name 'Proxy'),
+        $Proxy,
         [Parameter(ParameterSetName = "Basic", ValueFromPipeline = $true, ValueFromPipelineByPropertyName = $true)]
         [ValidateNotNullOrEmpty()]
         [Alias("Uri", "AbsoluteUri")]
@@ -25,6 +25,12 @@ function Set-WebProxy {
     )
 
     begin {
+        $Proxy_In = if ($Proxy) {
+            $Proxy
+        }
+        else {
+            Get-Config -Name 'Proxy'
+        }
         $ByPassList = New-Object 'System.Collections.Generic.List[string]'
         $_proxy = New-Object 'System.Net.Webproxy'
     }
@@ -41,7 +47,7 @@ function Set-WebProxy {
         if ($ProxyObject) {
             $_proxy = $ProxyObject
         }
-        else {
+        elseif ($Proxy_In) {
             $caps = [regex]::Match($Proxy, '^http://(?<credentials>(?<user>[^:@]+):(?<passwd>(?:[^@:]|\\:|\\@)+)@)?(?<address>(?:[^@:]+|\[[:0-9a-fA-F]+\])(?::\d+)?/?)$').Groups
             $address = $caps | Where-Object { $_.Name -eq "address" } | Select-Object -ExpandProperty "Value"
             $_proxy.Address = "http://$address"
@@ -57,6 +63,11 @@ function Set-WebProxy {
             if ($ByPassList.Length -gt 0) {
                 $_proxy.BypassList = $ByPassList
             }
+        }
+        else {
+            # Do nothing.
+            Write-Error 'Proxy not found! Operation aborted.'
+            return
         }
         $Env:HTTP_PROXY = $_proxy.Address.ToString().TrimEnd('/')
         $Env:HTTPS_PROXY = $Env:HTTP_PROXY

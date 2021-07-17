@@ -6,10 +6,20 @@ function Enable-Clang {
                 [System.IO.Path]::GetFileNameWithoutExtension((Get-Command $_)) -eq 'clang'
             })]
         [string]
-        $ClangPath = (Get-Config -Name 'Clang')
+        $ClangPath
     )
     [bool]$isVerbose = if ($VerbosePreference -eq "SilentlyContinue") { $false }else { $true }
-    $clangInfo = (&$ClangPath --version)
+    $_ClangPath = if ($ClangPath) {
+        $ClangPath
+    }
+    else {
+        Get-Config -Name 'Clang'
+    }
+    if (-not $_ClangPath) {
+        Write-Error 'Clang installation not found! operation aborted.'
+        return
+    }
+    $clangInfo = (&$_ClangPath --version)
     $clangInfo | Write-Verbose
     if (($clangInfo -match 'clang version').Count -eq 0) {
         Write-Error 'Failed to parse clang installation information.'

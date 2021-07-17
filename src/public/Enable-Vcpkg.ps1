@@ -7,14 +7,21 @@ function Enable-Vcpkg {
                 [System.IO.Path]::GetFileNameWithoutExtension((Get-Command ([System.IO.Path]::Combine($_, "vcpkg")))) -eq 'vcpkg'
             })]
         [string]
-        $VcpkgRoot = (Get-Config -Name 'VcpkgRoot')
+        $VcpkgRoot
     )
 
-    begin {
-        [bool]$isVerbose = if ($VerbosePreference -eq "SilentlyContinue") { $false }else { $true }
-    }
-
     end {
+        [bool]$isVerbose = if ($VerbosePreference -eq "SilentlyContinue") { $false }else { $true }
+        $_VcpkgRoot = if ($VcpkgRoot) {
+            $VcpkgRoot
+        }
+        else {
+            Get-Config -Name 'VcpkgRoot'
+        }
+        if (-not $_VcpkgRoot) {
+            Write-Error 'Vcpkg installation not found! operation aborted.'
+            return
+        }
         Add-Path $VcpkgRoot -Verbose:$isVerbose
         if (Get-Module -Name posh-vcpkg -ErrorAction SilentlyContinue) {
             Write-Verbose "PSModule 'posh-vcpkg' already imported."

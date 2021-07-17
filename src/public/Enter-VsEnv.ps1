@@ -80,10 +80,20 @@ function Enter-VsEnv {
                 [System.IO.Path]::GetFileNameWithoutExtension((Get-Command $_)) -eq 'vswhere'
             })]
         [string]
-        $VsWherePath = (Get-Config -Name 'VsWhere')
+        $VsWherePath
     )
 
     end {
+        $_VsWherePath = if ($VsWherePath) {
+            $VsWherePath
+        }
+        else {
+            Get-Config -Name 'VsWhere'
+        }
+        if (-not $_VsWherePath) {
+            Write-Error 'Vswhere installation not found! operation aborted.'
+            return
+        }
         if (!$NoSubShell -and !$Env:DTW_INSUBSHELL -and !$Env:DTW_NOSUBSHELL -and !$List) {
             $SelfInvokeCmdBuilder = [System.Collections.Generic.List[string]]@($PSCmdlet.MyInvocation.InvocationName)
             foreach ($k in $PSBoundParameters.Keys) {
@@ -111,7 +121,7 @@ function Enter-VsEnv {
             $Env:DTW_NOSUBSHELL = "1"
         }
         $QueryBuilder = [System.Collections.Generic.List[string]]@()
-        $QueryBuilder.Add("& `"$VsWherePath`"")
+        $QueryBuilder.Add("& `"$_VsWherePath`"")
         if ($InstallPath) {
             $InstallPath = [System.IO.Path]::GetFullPath($InstallPath)
             $QueryBuilder.Add("-path `"$InstallPath`"")
