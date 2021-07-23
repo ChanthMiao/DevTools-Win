@@ -48,7 +48,7 @@ function Set-WebProxy {
             $_proxy = $ProxyObject
         }
         elseif ($Proxy_In) {
-            $caps = [regex]::Match($Proxy, '^http://(?<credentials>(?<user>[^:@]+):(?<passwd>(?:[^@:]|\\:|\\@)+)@)?(?<address>(?:[^@:]+|\[[:0-9a-fA-F]+\])(?::\d+)?/?)$').Groups
+            $caps = [regex]::Match($Proxy_In, '^http://(?<credentials>(?<user>[^:@]+):(?<passwd>(?:[^@:]|\\:|\\@)+)@)?(?<address>(?:[^@:]+|\[[:0-9a-fA-F]+\])(?::\d+)?/?)$').Groups
             $address = $caps | Where-Object { $_.Name -eq "address" } | Select-Object -ExpandProperty "Value"
             $_proxy.Address = "http://$address"
             $_proxy.BypassProxyOnLocal = $true
