@@ -1,4 +1,4 @@
-function Set-StwConfig {
+function Set-DtwConfig {
     param (
         [Parameter(Mandatory = $true, Position = 0)]
         [ValidateSet('Proxy', 'VsWhere', 'VcpkgRoot', 'Clang', 'PyRoot')]
