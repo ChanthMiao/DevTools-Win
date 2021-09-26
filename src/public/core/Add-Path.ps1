@@ -79,7 +79,7 @@ function Add-Path {
     process {
         foreach ($pa in $Path) {
             $pa = $pa.Trim()
-            [string]$formatted_path = [System.IO.Path]::GetFullPath("$pa\", $PSCmdlet.CurrentProviderLocation("FileSystem").ProviderPath)
+            [string]$formatted_path = [System.IO.Path]::GetFullPath("$pa\")
             if (!$Force -and ![System.IO.Directory]::Exists($formatted_path)) {
                 Write-Warning "Directory $formatted_path does not exist, skiped!"
                 Continue

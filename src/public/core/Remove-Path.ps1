@@ -43,7 +43,7 @@ function Remove-Path {
     process {
         foreach ($pa in $Path) {
             $pa = $pa.Trim()
-            [string]$formatted_path = [System.IO.Path]::GetFullPath("$pa\", $PSCmdlet.CurrentProviderLocation("FileSystem").ProviderPath)
+            [string]$formatted_path = [System.IO.Path]::GetFullPath("$pa\")
             if (-not $_paths.Contains($formatted_path)) {
                 if ([System.IO.Path]::GetPathRoot($formatted_path) -ne $formatted_path) {
                     $formatted_path = $formatted_path.TrimEnd([System.IO.Path]::DirectorySeparatorChar)
