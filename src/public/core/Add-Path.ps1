@@ -85,13 +85,13 @@ function Add-Path {
                 Continue
             }
             if ($_paths.Contains($formatted_path)) {
-                Write-Warning "Directory $formatted_path is already in Env:\$Target, skiped!"
+                Write-Verbose "Directory $formatted_path is already in Env:\$Target, skiped!"
                 Continue
             }
             elseif ([System.IO.Path]::GetPathRoot($formatted_path) -ne $formatted_path) {
                 $formatted_path = $formatted_path.TrimEnd([System.IO.Path]::DirectorySeparatorChar)
                 if ($_paths.Contains($formatted_path)) {
-                    Write-Warning "Directory $formatted_path is already in Env:\$Target, skiped!"
+                    Write-Verbose "Directory $formatted_path is already in Env:\$Target, skiped!"
                     Continue
                 }
             }

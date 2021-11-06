@@ -29,6 +29,9 @@ function Get-DefaultConfig {
                 $null
             }
         }
+        'RustMirror' {
+            'RsProxy'
+        }
         Default { $null }
     }
 }

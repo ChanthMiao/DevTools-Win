@@ -1,7 +1,7 @@
 function Get-DtwConfig {
     param (
         [Parameter(Mandatory = $true)]
-        [ValidateSet('Proxy', 'VsWhere', 'VcpkgRoot', 'Clang', 'PyRoot')]
+        [ValidateSet('Proxy', 'VsWhere', 'VcpkgRoot', 'Clang', 'PyRoot', 'RustMirror')]
         [string]
         $Name,
         [Parameter()]

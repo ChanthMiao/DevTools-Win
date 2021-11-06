@@ -84,13 +84,10 @@ function Enter-VsEnv {
     )
 
     end {
-        $_VsWherePath = if ($VsWherePath) {
-            $VsWherePath
+        if (-not $VsWherePath) {
+            $VsWherePath = Get-Config -Name 'VsWhere'
         }
-        else {
-            Get-Config -Name 'VsWhere'
-        }
-        if (-not $_VsWherePath) {
+        if (-not $VsWherePath) {
             Write-Error 'Vswhere installation not found! operation aborted.'
             return
         }
@@ -121,7 +118,7 @@ function Enter-VsEnv {
             $Env:DTW_NOSUBSHELL = "1"
         }
         $QueryBuilder = [System.Collections.Generic.List[string]]@()
-        $QueryBuilder.Add("& `"$_VsWherePath`"")
+        $QueryBuilder.Add("& `"$VsWherePath`"")
         if ($InstallPath) {
             $InstallPath = [System.IO.Path]::GetFullPath($InstallPath)
             $QueryBuilder.Add("-path `"$InstallPath`"")

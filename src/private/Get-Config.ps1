@@ -78,6 +78,20 @@ function Get-Config {
                 $null
             }
         }
+        'RustMirror' {
+            if ($Env:Rust_Mirror) {
+                $Env:Rust_Mirror
+            }
+            elseif ($Script:DevToolsConf.Rust_Mirror) {
+                $Script:DevToolsConf.Rust_Mirror
+            }
+            elseif (-not $NoDefault) {
+                Get-DefaultConfig $Name
+            }
+            else {
+                $null
+            }
+        }
         Default { $null }
     }
 }

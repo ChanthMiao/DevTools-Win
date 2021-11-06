@@ -11,13 +11,10 @@ function Enable-Python {
     )
     end {
         [bool]$isVerbose = if ($VerbosePreference -eq "SilentlyContinue") { $false }else { $true }
-        $_PyRoot = if ($PyRoot) {
-            $PyRoot
+        if (-not $PyRoot) {
+            $PyRoot = Get-Config -Name 'PyRoot'
         }
-        else {
-            Get-Config -Name 'PyRoot'
-        }
-        if (-not $_PyRoot) {
+        if (-not $PyRoot) {
             Write-Error 'Python installation not found! operation aborted.'
             return
         }
@@ -26,9 +23,9 @@ function Enable-Python {
             $DTW_PyScriptDir = [System.IO.Path]::Combine($Env:DTW_PY_ROOT, 'Scripts')
             $Env:DTW_PY_ROOT, $DTW_PyScriptDir | Remove-Path -Verbose:$isVerbose -Mode 'All'
         }
-        $PyScriptDir = [System.IO.Path]::Combine($_PyRoot, 'Scripts')
-        $PyScriptDir, $_PyRoot | Add-Path -Verbose:$isVerbose
-        $Env:DTW_PY_ROOT = $_PyRoot
+        $PyScriptDir = [System.IO.Path]::Combine($PyRoot, 'Scripts')
+        $PyScriptDir, $PyRoot | Add-Path -Verbose:$isVerbose
+        $Env:DTW_PY_ROOT = $PyRoot
     }
 }
 

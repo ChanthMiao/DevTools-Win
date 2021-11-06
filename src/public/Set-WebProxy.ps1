@@ -25,11 +25,8 @@ function Set-WebProxy {
     )
 
     begin {
-        $Proxy_In = if ($Proxy) {
-            $Proxy
-        }
-        else {
-            Get-Config -Name 'Proxy'
+        if (-not $Proxy) {
+            $Proxy = Get-Config -Name 'Proxy'
         }
         $ByPassList = New-Object 'System.Collections.Generic.List[string]'
         $_proxy = New-Object 'System.Net.Webproxy'
@@ -47,8 +44,8 @@ function Set-WebProxy {
         if ($ProxyObject) {
             $_proxy = $ProxyObject
         }
-        elseif ($Proxy_In) {
-            $caps = [regex]::Match($Proxy_In, '^http://(?<credentials>(?<user>[^:@]+):(?<passwd>(?:[^@:]|\\:|\\@)+)@)?(?<address>(?:[^@:]+|\[[:0-9a-fA-F]+\])(?::\d+)?/?)$').Groups
+        elseif ($Proxy) {
+            $caps = [regex]::Match($Proxy, '^http://(?<credentials>(?<user>[^:@]+):(?<passwd>(?:[^@:]|\\:|\\@)+)@)?(?<address>(?:[^@:]+|\[[:0-9a-fA-F]+\])(?::\d+)?/?)$').Groups
             $address = $caps | Where-Object { $_.Name -eq "address" } | Select-Object -ExpandProperty "Value"
             $_proxy.Address = "http://$address"
             $_proxy.BypassProxyOnLocal = $true

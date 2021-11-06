@@ -12,13 +12,10 @@ function Enable-Vcpkg {
 
     end {
         [bool]$isVerbose = if ($VerbosePreference -eq "SilentlyContinue") { $false }else { $true }
-        $_VcpkgRoot = if ($VcpkgRoot) {
-            $VcpkgRoot
+        if (-not $VcpkgRoot) {
+            $VcpkgRoot = Get-Config -Name 'VcpkgRoot'
         }
-        else {
-            Get-Config -Name 'VcpkgRoot'
-        }
-        if (-not $_VcpkgRoot) {
+        if (-not $VcpkgRoot) {
             Write-Error 'Vcpkg installation not found! operation aborted.'
             return
         }

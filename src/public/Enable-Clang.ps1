@@ -9,17 +9,14 @@ function Enable-Clang {
         $ClangPath
     )
     [bool]$isVerbose = if ($VerbosePreference -eq "SilentlyContinue") { $false }else { $true }
-    $_ClangPath = if ($ClangPath) {
-        $ClangPath
+    if (-not $ClangPath) {
+        $ClangPath = Get-Config -Name 'Clang'
     }
-    else {
-        Get-Config -Name 'Clang'
-    }
-    if (-not $_ClangPath) {
+    if (-not $ClangPath) {
         Write-Error 'Clang installation not found! operation aborted.'
         return
     }
-    $clangInfo = (&$_ClangPath --version)
+    $clangInfo = (&$ClangPath --version)
     $clangInfo | Write-Verbose
     if (($clangInfo -match 'clang version').Count -eq 0) {
         Write-Error 'Failed to parse clang installation information.'

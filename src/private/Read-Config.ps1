@@ -1,10 +1,11 @@
 function Read-Config {
     $DevToolsConf = [ordered]@{
-        Proxy     = $null;
-        VsWhere   = $null;
-        VcpkgRoot = $null;
-        Clang     = $null;
-        PyRoot    = $null;
+        Proxy      = $null;
+        VsWhere    = $null;
+        VcpkgRoot  = $null;
+        Clang      = $null;
+        PyRoot     = $null;
+        RustMirror = $null;
     }
     $config_path = [System.IO.Path]::Combine($Env:LOCALAPPDATA, "DevTools-Win", "config.json")
     if ([System.IO.File]::Exists($config_path)) {
@@ -23,6 +24,9 @@ function Read-Config {
         }
         if ($json.PyRoot) {
             $DevToolsConf.PyRoot = $json.PyRoot
+        }
+        if ($json.RustMirror) {
+            $DevToolsConf.RustMirror = $json.RustMirror
         }
     }
     Set-Variable -Name DevToolsConf -Value $DevToolsConf -Scope Script -Force
