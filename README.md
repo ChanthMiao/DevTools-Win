@@ -27,12 +27,21 @@
 |     Stop-Log      | splg  | 停止记录当前 Powershell 会话或脚本输出            |
 |  New-RandString   |  nrs  | 生成随机字符串                                    |
 |   Enable-Python   |  epy  | 切换当前会话的Python环境                          |
+|  Set-RustMirror   | srsm  | 设置 rust 镜像                                    |
 
 ## 命令详细文档
 
 ~~暂无计划，此模块目前主要是自用~~（欢迎PR）
 
 ## 安装
+
+***注意***
+
+自v1.1.6起，本模块依赖PsIni模块。
+
+```powershell
+Install-Module PsIni
+```
 
 主要安装方式有三：
 
@@ -82,8 +91,9 @@ ls .\lib
     "Proxy": "http://192.168.36.1:8080", // 避免每次使用swp时重复输入，可被$Env:HTTP(S)_PROXY覆盖，默认为空
     "VsWhere": "C:\\Program Files (x86)\\Microsoft Visual Studio\\Installer\\vswhere.exe", // 指定vswhere程序路径，可被$Env:VSWHERE_PATH覆盖
     "VcpkgRoot": "C:\\Users\\abc\\source\\repos\\vcpkg", // 指定 vcpkg 根目录，可被$Env:VCPKG_ROOT覆盖，默认为空
-    "Clang": "C:\\Users\\abc\\scoop\\shims\\clang.ps1", // 指定clang路径，可被$Env:CLANG_PATH覆盖，默认为空
+    "Clang": "C:\\Users\\abc\\scoop\\shims\\clang.ps1", // 指定 clang 路径，可被$Env:CLANG_PATH覆盖，默认为空
     "PyRoot": "C:\\Users\\abc\\AppData\\Local\\Programs\\Python\\Python38", // 指定 Python 根目录，可被$Env:Py_ROOT覆盖，默认自动检测
+    "RustMirror": "rsproxy" // 指定 rust 镜像源名称，默认为rsproxy
 }
 ```
 

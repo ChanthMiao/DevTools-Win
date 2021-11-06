@@ -27,12 +27,22 @@ A collection of Powershell scripts for personal use under Windows, which can eff
 |     Stop-Log      | splg  | Stop recording the current Powershell session or script output                               |
 |  New-RandString   |  nrs  | Generate random string                                                                       |
 |   Enable-Python   |  epy  | Switch the Python environment of the current session                                         |
+|  Set-RustMirror   | srsm  | Set rust mirror                                                                              |
 
 ## Document
 
 ~~This module is mainly for personal daily working, there is no plan to write documents currently.~~（PR is welcomed）
 
 ## Installation
+
+***Note***
+
+自v1.1.6起，本模块依赖PsIni模块。
+This module depends at PsIni, since v1.1.6.
+
+```powershell
+Install-Module PsIni
+```
 
 There are three main installation methods:
 
@@ -84,6 +94,7 @@ The custom configuration is stored in the config.json file (comments not support
     "VcpkgRoot": "C:\\Users\\abc\\source\\repos\\vcpkg", // Specify the root directory of vcpkg, which can be overridden by $Env:VCPKG_ROOT. The default value is empty.
     "Clang": "C:\\Users\\abc\\scoop\\shims\\clang.ps1", // Specify the clang path, which can be overridden by $Env:CLANG_PATH. The default value is empty
     "PyRoot": "C:\\Users\\abc\\AppData\\Local\\Programs\\Python\\Python38", // Specify the python installpath，which can be overridden by $Env:Py_ROOT. The default value is auto-detected.
+    "RustMirror": "rsproxy" // Specify rust mirror provider. The default value is rsproxy.
 }
 ```
 
