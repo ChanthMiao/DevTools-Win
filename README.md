@@ -35,14 +35,6 @@
 
 ## 安装
 
-***注意***
-
-自v1.1.6起，本模块依赖PsIni模块。
-
-```powershell
-Install-Module PsIni
-```
-
 主要安装方式有三：
 
 - 手动下载仓库[源码包](https://github.com/xmake-io/xmake/archive/refs/heads/master.zip)，并解压至 PSModulePath 所包含的路径下；

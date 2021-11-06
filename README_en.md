@@ -35,11 +35,6 @@ A collection of Powershell scripts for personal use under Windows, which can eff
 
 ## Installation
 
-***Note***
-
-自v1.1.6起，本模块依赖PsIni模块。
-This module depends at PsIni, since v1.1.6.
-
 ```powershell
 Install-Module PsIni
 ```

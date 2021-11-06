@@ -12,7 +12,7 @@
     RootModule             = 'DevTools-Win.psm1'
 
     # Version number of this module.
-    ModuleVersion          = '1.1.6'
+    ModuleVersion          = '1.1.7'
 
     # Supported PSEditions
     CompatiblePSEditions   = @('Core', "Desktop")
@@ -66,7 +66,7 @@
     # FormatsToProcess = @()
 
     # Modules to import as nested modules of the module specified in RootModule/ModuleToProcess
-    NestedModules = @("PsIni")
+    # NestedModules = @()
 
     # Functions to export from this module, for best performance, do not use wildcards and do not delete the entry, use an empty array if there are no functions to export.
     FunctionsToExport      = @(

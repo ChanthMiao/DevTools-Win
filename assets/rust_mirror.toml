@@ -1,6 +1,6 @@
 [source.crates-io]
 registry = "https://github.com/rust-lang/crates.io-index"
-replace-with = 'rsproxy'
+replace-with = "rsproxy"
 
 [source.rsproxy]
 registry = "https://rsproxy.cn/crates.io-index"
@@ -16,16 +16,16 @@ registry = "https://mirrors.tuna.tsinghua.edu.cn/git/crates.io-index.git"
 
 [rustup.rsproxy]
 dist-server = "https://rsproxy.cn"
-update-root = 'https://rsproxy.cn/rustup'
+update-root = "https://rsproxy.cn/rustup"
 
 [rustup.ustc]
 dist-server = "https://mirrors.ustc.edu.cn/rust-static"
-update-root = 'https://mirrors.ustc.edu.cn/rust-static/rustup'
+update-root = "https://mirrors.ustc.edu.cn/rust-static/rustup"
 
 [rustup.sjtu]
 dist-server = "https://mirrors.sjtug.sjtu.edu.cn/rust-static"
-update-root = 'https://mirrors.sjtug.sjtu.edu.cn/rust-static/rustup'
+update-root = "https://mirrors.sjtug.sjtu.edu.cn/rust-static/rustup"
 
 [rustup.tuna]
 dist-server = "https://mirrors.tuna.tsinghua.edu.cn/rustup"
-update-root = 'https://mirrors.tuna.tsinghua.edu.cn/rustup/rustup'
+update-root = "https://mirrors.tuna.tsinghua.edu.cn/rustup/rustup"
