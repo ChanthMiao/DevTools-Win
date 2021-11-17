@@ -30,7 +30,7 @@ function Get-DefaultConfig {
             }
         }
         'RustMirror' {
-            'RsProxy'
+            'rsproxy'
         }
         Default { $null }
     }
