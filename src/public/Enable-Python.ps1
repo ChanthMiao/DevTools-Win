@@ -22,9 +22,12 @@ function Enable-Python {
         if ($Env:DTW_PY_ROOT) {
             $DTW_PyScriptDir = [System.IO.Path]::Combine($Env:DTW_PY_ROOT, 'Scripts')
             $Env:DTW_PY_ROOT, $DTW_PyScriptDir | Remove-Path -Verbose:$isVerbose -Mode 'All'
+            Remove-Path -Match { param([string]$s) $s.StartsWith("$Env:APPDATA\Python\Python") }
         }
+        $PySubDir = [System.IO.Directory]::GetParent($PyRoot).BaseName
+        $UserScriptDir = [System.IO.Path]::Combine($env:APPDATA, "Python\$PySubDir\Scripts")
         $PyScriptDir = [System.IO.Path]::Combine($PyRoot, 'Scripts')
-        $PyScriptDir, $PyRoot | Add-Path -Verbose:$isVerbose
+        $PyRoot, $PyScriptDir, $UserScriptDir | Add-Path -Verbose:$isVerbose
         $Env:DTW_PY_ROOT = $PyRoot
     }
 }
