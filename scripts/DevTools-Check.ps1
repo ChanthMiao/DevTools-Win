@@ -28,18 +28,6 @@ if ([System.Environment]::OSVersion.Platform -eq [System.PlatformID]::Win32NT) {
             # Load Microsoft.Windows.SDK.NET.dll and WinRT.Runtime.dll.
             $LocalCswinrtVersion = Get-LocalDllVersion -DllPath "$ModuleRoot\lib\WinRT.Runtime.dll"
             $LocalWdkVersion = Get-LocalDllVersion -DllPath "$ModuleRoot\lib\Microsoft.Windows.SDK.NET.dll"
-            $WdkPattern = if ([System.Environment]::OSVersion.Version -ge [System.Version]"10.0.20348.0") {
-                "10.0.20348."
-            }
-            elseif ([System.Environment]::OSVersion.Version -ge [System.Version]"10.0.19041.0") {
-                "10.0.19041."
-            }
-            elseif ([System.Environment]::OSVersion.Version -ge [System.Version]"10.0.18362.0") {
-                "10.0.18362."
-            }
-            else {
-                "10.0.17763."
-            }
             # Need download deps.
             if ((-not $LocalCswinrtVersion) -or (-not $LocalWdkVersion)) {
                 $BaseUri = Get-PackageBaseAddress -ErrorAction SilentlyContinue
@@ -50,7 +38,19 @@ if ([System.Environment]::OSVersion.Platform -eq [System.PlatformID]::Win32NT) {
                 try {
                     # For load speed, not invoke update here.
                     if (-not $LocalWdkVersion) {
-                        $WdkVersion = (Get-PackageVersions -LowID "microsoft.windows.sdk.net.ref" -PackageBaseAddress $BaseUri | Select-String -Pattern $WdkPattern)[-1]
+                        $WDKVers = (Get-PackageVersions -LowID "microsoft.windows.sdk.net.ref" -PackageBaseAddress $BaseUri)
+                        $WdkVersion = $WDKVers[0].ToString();
+                        # try to find most nearest version.
+                        foreach ($pkgversion in $WDKVers) {
+                            $verstr = $pkgversion.ToString()
+                            if ([System.Environment]::OSVersion.Version -ge [System.Version]($verstr)) {
+                                $WdkVersion = $verstr
+                            }
+                            else {
+                                break
+                            }
+                        }
+                        # Download nupkg
                         $Wdk = Invoke-NupkgDownload -LowID "microsoft.windows.sdk.net.ref" -LowVersion $WdkVersion -PackageBaseAddress $BaseUri
                         "lib\WinRT.Runtime.dll", "lib\Microsoft.Windows.SDK.NET.dll" | Invoke-NupkgExtract -NupkgPath $Wdk -DestDir "$ModuleRoot\lib"
                     }

@@ -65,13 +65,18 @@ function Invoke-NupkgDownload {
         [string]
         $PackageBaseAddress
     )
-    $rsp = Invoke-WebRequest -Uri "${PackageBaseAddress}${LowID}/${LowVersion}/${LowID}.${LowVersion}.nupkg" -TimeoutSec 30  -OutFile "${PSScriptRoot}/${LowID}.${LowVersion}.nupkg" -PassThru
+
+    $RandomDir = Join-Path ([System.IO.Path]::GetTempPath()) (New-Guid).ToString("N")
+    New-Item -Path $RandomDir -ItemType Directory -Force | Out-Null
+
+    $rsp = Invoke-WebRequest -Uri "${PackageBaseAddress}${LowID}/${LowVersion}/${LowID}.${LowVersion}.nupkg" -TimeoutSec 30  -OutFile "${RandomDir}/${LowID}.${LowVersion}.nupkg" -PassThru
+
     if ($rsp.StatusCode -ne 200) {
         Remove-Variable -Name "rsp"
         return
     }
     Remove-Variable -Name "rsp"
-    return "${PSScriptRoot}/${LowID}.${LowVersion}.nupkg"
+    return "${RandomDir}/${LowID}.${LowVersion}.nupkg"
 }
 
 function Invoke-NupkgExtract {
@@ -95,18 +100,13 @@ function Invoke-NupkgExtract {
             New-Item -Path $DestDir -ItemType Directory -Force | Out-Null
         }
 
-        $TmpExtractDir = "${PSScriptRoot}\$(Split-Path -Path $NupkgPath -LeafBase)"
+        $TmpExtractDir = [System.IO.Path]::GetDirectoryName($NupkgPath)
 
-        if (-not (Test-Path -Path $TmpExtractDir -PathType Container)) {
-            New-Item -Path $TmpExtractDir -ItemType Directory -Force | Out-Null
-        }
         Expand-Archive -Path $NupkgPath -DestinationPath $TmpExtractDir -Force
     }
 
     process {
-        foreach ($fname in $FullName) {
-            Move-Item "${TmpExtractDir}\${FullName}" $DestDir -Force
-        }
+        Get-ChildItem -Path $TmpExtractDir -Name '*.dll' -Recurse -File | ForEach-Object { Join-Path $TmpExtractDir $_ } | Move-Item -Destination $DestDir
     }
 
     end {
