@@ -12,7 +12,7 @@
     RootModule             = 'DevTools-Win.psm1'
 
     # Version number of this module.
-    ModuleVersion          = '1.1.7'
+    ModuleVersion          = '1.1.8'
 
     # Supported PSEditions
     CompatiblePSEditions   = @('Core', "Desktop")
@@ -85,7 +85,6 @@
         'Remove-Path',
         'Send-Notification',
         'Set-DtwConfig',
-        'Set-RustMirror',
         'Set-WebProxy',
         'Show-DtwConfig',
         'Start-Log',
@@ -119,7 +118,6 @@
         'sdnf',
         'shdcf',
         'splg',
-        'srsm',
         'swp',
         'wrlg'
     )
