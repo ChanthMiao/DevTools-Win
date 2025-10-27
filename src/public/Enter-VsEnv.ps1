@@ -147,7 +147,7 @@ function Enter-VsEnv {
                 $QueryBuilder.Add('-latest')
             }
         }
-        $QueryBuilder.Add('-format json -nologo -utf8')
+        $QueryBuilder.Add('-format json -nologo')
         $Query = [string]::Join(' ', $QueryBuilder)
         Write-Debug $Query
         $Results = (Invoke-Expression $Query | ConvertFrom-Json)
